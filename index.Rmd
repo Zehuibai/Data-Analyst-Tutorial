@@ -1,0 +1,44 @@
+--- 
+title: "Data Analyst Tutorial"
+author: "Zehui Bai"
+date: "`r Sys.Date()`"
+site: bookdown::bookdown_site
+---
+
+# Introduction
+
+Data analysis is the process of examining and interpreting data to extract meaningful insights and conclusions. SAS and R are both popular programming languages used for data analysis. SAS is a proprietary software suite that provides a range of tools for data management, data analysis, and reporting. R, on the other hand, is an open-source programming language that offers a wide range of statistical and graphical techniques for data analysis.
+
+The R Project for Statistical Computing is hosted at https://www.r-project.org/. R can be downloaded from  CRAN at the following address: https://cran.r-project.org/mirrors.html. R is an open-source software which  is free to use. An open-source software is a software that can be accessed, used, or modified by  anybody. There is no one company which has the sole powers in this case. R was initially released in  1993 and was heavily built upon the previously created S programming language which originated from 1976. In addition to using R, there are Graphic-User-Interfaces available (GUIs) to use with R. One popular R  GUI is RStudio. RStudio is available for free online [https://rstudio.com/products/rstudio/]
+
+
+## Course Content
+
+* Data Management
+    * Data Management using SAS
+    * Data Management using R
+    * Proc SQL using SAS
+    * SAS Macro
+
+* Data Visualization
+    * Data Visualization using SAS
+    * Data Visualization using R
+    
+* General Data Analysis  
+    * Descriptive Statistics in SAS
+    * Descriptive Statistics in R
+    * Parametric Test
+    * ANOVA
+    * Multiple Comparison
+    * Non-Parametric Test
+    * Correlation and Regression
+    
+* Advance Data Analysis 
+    * Advanced Linear Regression
+    * Logistic Regression 
+    * Advanced Logistic Regression 
+    * Survival Analysis
+    * Advanced Survival Analysis
+    * Mixed Model
+    * Multiple Imputation
+    * Meta Analysis

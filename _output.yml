@@ -1,0 +1,8 @@
+bookdown::gitbook:
+  css: style.css
+  config:
+    toc:
+      before: |
+        <li><a href="./">Data-Analyst-Tutorial</a></li>
+      after: |
+        <li><a href="https://zehuibai.github.io/" target="blank">Author Profile</a></li>

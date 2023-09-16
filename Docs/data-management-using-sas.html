@@ -1,0 +1,1337 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Chapter 3 Data Management using SAS | Data Analyst Tutorial</title>
+  <meta name="description" content="Chapter 3 Data Management using SAS | Data Analyst Tutorial" />
+  <meta name="generator" content="bookdown 0.34 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Chapter 3 Data Management using SAS | Data Analyst Tutorial" />
+  <meta property="og:type" content="book" />
+  
+  
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 3 Data Management using SAS | Data Analyst Tutorial" />
+  
+  
+  
+
+<meta name="author" content="Zehui Bai" />
+
+
+<meta name="date" content="2023-09-16" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="data-management-using-r.html"/>
+<link rel="next" href="references.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+
+
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Data-Analyst-Tutorial</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="index.html"><a href="index.html#course-content"><i class="fa fa-check"></i><b>1.1</b> Course Content</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="data-management-using-r.html"><a href="data-management-using-r.html"><i class="fa fa-check"></i><b>2</b> Data Management using R</a></li>
+<li class="chapter" data-level="3" data-path="data-management-using-sas.html"><a href="data-management-using-sas.html"><i class="fa fa-check"></i><b>3</b> Data Management using SAS</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="data-management-using-sas.html"><a href="data-management-using-sas.html#input-data-into-sas"><i class="fa fa-check"></i><b>3.1</b> Input data into SAS</a>
+<ul>
+<li class="chapter" data-level="3.1.1" data-path="data-management-using-sas.html"><a href="data-management-using-sas.html#native-datasets-input"><i class="fa fa-check"></i><b>3.1.1</b> Native datasets input</a></li>
+<li class="chapter" data-level="3.1.2" data-path="data-management-using-sas.html"><a href="data-management-using-sas.html#reading-free-formatted-data-instream"><i class="fa fa-check"></i><b>3.1.2</b> Reading free formatted data instream</a></li>
+<li class="chapter" data-level="3.1.3" data-path="data-management-using-sas.html"><a href="data-management-using-sas.html#reading-fixed-formatted-data-instream"><i class="fa fa-check"></i><b>3.1.3</b> Reading fixed formatted data instream</a></li>
+<li class="chapter" data-level="3.1.4" data-path="data-management-using-sas.html"><a href="data-management-using-sas.html#infile-reading-fixed-formatted-data-from-an-external-file"><i class="fa fa-check"></i><b>3.1.4</b> INFILE: Reading fixed formatted data from an external file</a></li>
+<li class="chapter" data-level="3.1.5" data-path="data-management-using-sas.html"><a href="data-management-using-sas.html#write-the-sas-file"><i class="fa fa-check"></i><b>3.1.5</b> Write the SAS File</a></li>
+<li class="chapter" data-level="3.1.6" data-path="data-management-using-sas.html"><a href="data-management-using-sas.html#import-csv-data"><i class="fa fa-check"></i><b>3.1.6</b> Import csv data</a></li>
+<li class="chapter" data-level="3.1.7" data-path="data-management-using-sas.html"><a href="data-management-using-sas.html#import"><i class="fa fa-check"></i><b>3.1.7</b> %Import</a></li>
+<li class="chapter" data-level="3.1.8" data-path="data-management-using-sas.html"><a href="data-management-using-sas.html#url"><i class="fa fa-check"></i><b>3.1.8</b> URL</a></li>
+<li class="chapter" data-level="3.1.9" data-path="data-management-using-sas.html"><a href="data-management-using-sas.html#infile-read-multiple-raw-data-files"><i class="fa fa-check"></i><b>3.1.9</b> Infile Read multiple raw data files</a></li>
+<li class="chapter" data-level="3.1.10" data-path="data-management-using-sas.html"><a href="data-management-using-sas.html#generate-automatic-file-name"><i class="fa fa-check"></i><b>3.1.10</b> Generate automatic file name</a></li>
+</ul></li>
+<li class="chapter" data-level="3.2" data-path="data-management-using-sas.html"><a href="data-management-using-sas.html#format-the-variables"><i class="fa fa-check"></i><b>3.2</b> Format the variables</a>
+<ul>
+<li class="chapter" data-level="3.2.1" data-path="data-management-using-sas.html"><a href="data-management-using-sas.html#proc-format"><i class="fa fa-check"></i><b>3.2.1</b> Proc format</a></li>
+<li class="chapter" data-level="3.2.2" data-path="data-management-using-sas.html"><a href="data-management-using-sas.html#copy-and-combine-sas-format-libraries"><i class="fa fa-check"></i><b>3.2.2</b> Copy and combine SAS format libraries</a></li>
+<li class="chapter" data-level="3.2.3" data-path="data-management-using-sas.html"><a href="data-management-using-sas.html#build-a-format-from-a-dataset"><i class="fa fa-check"></i><b>3.2.3</b> Build a format from a dataset</a></li>
+<li class="chapter" data-level="3.2.4" data-path="data-management-using-sas.html"><a href="data-management-using-sas.html#output-format-as-datasets"><i class="fa fa-check"></i><b>3.2.4</b> Output format as datasets</a></li>
+<li class="chapter" data-level="3.2.5" data-path="data-management-using-sas.html"><a href="data-management-using-sas.html#delete-the-format"><i class="fa fa-check"></i><b>3.2.5</b> Delete the format</a></li>
+</ul></li>
+<li class="chapter" data-level="3.3" data-path="data-management-using-sas.html"><a href="data-management-using-sas.html#array"><i class="fa fa-check"></i><b>3.3</b> Array</a>
+<ul>
+<li class="chapter" data-level="3.3.1" data-path="data-management-using-sas.html"><a href="data-management-using-sas.html#defining"><i class="fa fa-check"></i><b>3.3.1</b> Defining</a></li>
+<li class="chapter" data-level="3.3.2" data-path="data-management-using-sas.html"><a href="data-management-using-sas.html#format-multiple-variables"><i class="fa fa-check"></i><b>3.3.2</b> Format multiple variables</a></li>
+<li class="chapter" data-level="3.3.3" data-path="data-management-using-sas.html"><a href="data-management-using-sas.html#arrays"><i class="fa fa-check"></i><b>3.3.3</b> 2*2 arrays</a></li>
+<li class="chapter" data-level="3.3.4" data-path="data-management-using-sas.html"><a href="data-management-using-sas.html#dynamic-element-list-using-macro-variables"><i class="fa fa-check"></i><b>3.3.4</b> Dynamic Element List using Macro Variables</a></li>
+</ul></li>
+<li class="chapter" data-level="3.4" data-path="data-management-using-sas.html"><a href="data-management-using-sas.html#retain"><i class="fa fa-check"></i><b>3.4</b> Retain</a>
+<ul>
+<li class="chapter" data-level="3.4.1" data-path="data-management-using-sas.html"><a href="data-management-using-sas.html#generate-serial-number"><i class="fa fa-check"></i><b>3.4.1</b> Generate Serial Number</a></li>
+<li class="chapter" data-level="3.4.2" data-path="data-management-using-sas.html"><a href="data-management-using-sas.html#change-from-basilne"><i class="fa fa-check"></i><b>3.4.2</b> Change from Basilne</a></li>
+</ul></li>
+<li class="chapter" data-level="3.5" data-path="data-management-using-sas.html"><a href="data-management-using-sas.html#data-utilities"><i class="fa fa-check"></i><b>3.5</b> Data utilities</a>
+<ul>
+<li class="chapter" data-level="3.5.1" data-path="data-management-using-sas.html"><a href="data-management-using-sas.html#scan"><i class="fa fa-check"></i><b>3.5.1</b> %Scan</a></li>
+<li class="chapter" data-level="3.5.2" data-path="data-management-using-sas.html"><a href="data-management-using-sas.html#eval-and-syseval"><i class="fa fa-check"></i><b>3.5.2</b> %eval and %syseval</a></li>
+<li class="chapter" data-level="3.5.3" data-path="data-management-using-sas.html"><a href="data-management-using-sas.html#macro-variable-status"><i class="fa fa-check"></i><b>3.5.3</b> Macro variable status</a></li>
+<li class="chapter" data-level="3.5.4" data-path="data-management-using-sas.html"><a href="data-management-using-sas.html#sysfunc"><i class="fa fa-check"></i><b>3.5.4</b> %SYSFUNC</a></li>
+<li class="chapter" data-level="3.5.5" data-path="data-management-using-sas.html"><a href="data-management-using-sas.html#quoting-function"><i class="fa fa-check"></i><b>3.5.5</b> Quoting Function</a></li>
+<li class="chapter" data-level="3.5.6" data-path="data-management-using-sas.html"><a href="data-management-using-sas.html#call-symput"><i class="fa fa-check"></i><b>3.5.6</b> Call Symput</a></li>
+<li class="chapter" data-level="3.5.7" data-path="data-management-using-sas.html"><a href="data-management-using-sas.html#call-execute"><i class="fa fa-check"></i><b>3.5.7</b> Call Execute</a></li>
+<li class="chapter" data-level="3.5.8" data-path="data-management-using-sas.html"><a href="data-management-using-sas.html#sysfunc-get-the-observations"><i class="fa fa-check"></i><b>3.5.8</b> %sysfunc get the observations</a></li>
+</ul></li>
+<li class="chapter" data-level="3.6" data-path="data-management-using-sas.html"><a href="data-management-using-sas.html#clean-up"><i class="fa fa-check"></i><b>3.6</b> Clean Up</a>
+<ul>
+<li class="chapter" data-level="3.6.1" data-path="data-management-using-sas.html"><a href="data-management-using-sas.html#basic-setting"><i class="fa fa-check"></i><b>3.6.1</b> Basic setting</a></li>
+<li class="chapter" data-level="3.6.2" data-path="data-management-using-sas.html"><a href="data-management-using-sas.html#delete-datasets"><i class="fa fa-check"></i><b>3.6.2</b> Delete datasets</a></li>
+<li class="chapter" data-level="3.6.3" data-path="data-management-using-sas.html"><a href="data-management-using-sas.html#deleting-formats"><i class="fa fa-check"></i><b>3.6.3</b> Deleting Formats</a></li>
+<li class="chapter" data-level="3.6.4" data-path="data-management-using-sas.html"><a href="data-management-using-sas.html#remove-assigned-formats"><i class="fa fa-check"></i><b>3.6.4</b> Remove assigned formats</a></li>
+<li class="chapter" data-level="3.6.5" data-path="data-management-using-sas.html"><a href="data-management-using-sas.html#delete-macro-variables"><i class="fa fa-check"></i><b>3.6.5</b> Delete macro variables</a></li>
+<li class="chapter" data-level="3.6.6" data-path="data-management-using-sas.html"><a href="data-management-using-sas.html#delete-macro"><i class="fa fa-check"></i><b>3.6.6</b> Delete Macro</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
+<li class="divider"></li>
+<li><a href="https://zehuibai.github.io/" target="blank">Author Profile</a></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Data Analyst Tutorial</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="data-management-using-sas" class="section level1 hasAnchor" number="3">
+<h1><span class="header-section-number">Chapter 3</span> Data Management using SAS<a href="data-management-using-sas.html#data-management-using-sas" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<div id="input-data-into-sas" class="section level2 hasAnchor" number="3.1">
+<h2><span class="header-section-number">3.1</span> Input data into SAS<a href="data-management-using-sas.html#input-data-into-sas" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="native-datasets-input" class="section level3 hasAnchor" number="3.1.1">
+<h3><span class="header-section-number">3.1.1</span> Native datasets input<a href="data-management-using-sas.html#native-datasets-input" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<pre><code>libname libref &quot;dir_location&quot;;
+data ds;
+  set libref.sasfilename; /* Note: no file extension */
+  ...
+run;
+
+data ds;
+set &quot;dir_location\sasfilename.sas7bdat&quot;; 
+     /* Windows only */
+set &quot;dir_location/sasfilename.sas7bdat&quot;;
+     /* works on all OS including Windows */
+run;</code></pre>
+</div>
+<div id="reading-free-formatted-data-instream" class="section level3 hasAnchor" number="3.1.2">
+<h3><span class="header-section-number">3.1.2</span> Reading free formatted data instream<a href="data-management-using-sas.html#reading-free-formatted-data-instream" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<pre><code>DATA data1;
+ INPUT make $ model $ mpg weight price;
+CARDS;
+AMC Concord 22 2930 4099
+AMC Pacer   17 3350 4749
+AMC Spirit  22 2640 3799
+Buick Century 20 3250 4816
+Buick Electra 15 4080 7827
+;
+RUN; </code></pre>
+</div>
+<div id="reading-fixed-formatted-data-instream" class="section level3 hasAnchor" number="3.1.3">
+<h3><span class="header-section-number">3.1.3</span> Reading fixed formatted data instream<a href="data-management-using-sas.html#reading-fixed-formatted-data-instream" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>It need to provide the beginning and ending column numbers for each variable.</p>
+<pre><code>DATA data2;
+  INPUT make $ 1-5 model $ 6-12 mpg 13-14 weight 15-18 price 19-22;
+CARDS;
+AMC  Concord2229304099
+AMC  Pacer  1733504749
+AMC  Spirit 2226403799
+BuickCentury2032504816
+BuickElectra1540807827
+;
+RUN;</code></pre>
+</div>
+<div id="infile-reading-fixed-formatted-data-from-an-external-file" class="section level3 hasAnchor" number="3.1.4">
+<h3><span class="header-section-number">3.1.4</span> INFILE: Reading fixed formatted data from an external file<a href="data-management-using-sas.html#infile-reading-fixed-formatted-data-from-an-external-file" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<pre><code>The data3.dat file:
+
+AMC  Concord2229304099
+AMC  Pacer  1733504749
+AMC  Spirit 2226403799
+BuickCentury2032504816
+BuickElectra1540807827 
+
+DATA cars3;
+  INFILE &quot;~/path/data3.dat&quot;;
+  INPUT make $ 1-5 model $ 6-12 mpg 13-14 weight 15-18 price 19-22;
+RUN;
+
+*** with special (comma) delimited
+*** tab delimited: DELIMITER=&#39;09&#39;x;
+*** comma delimited: delimiter=&#39;,&#39;;
+
+AMC,Concord,22,2930,4099
+AMC,Pacer,17,3350,4749
+AMC,Spirit,22,2640,3799
+Buick,Century,20,3250,4816
+Buick,Electra,15,4080,7827 
+
+DATA cars5;
+  INFILE &quot;~/path/data3.dat&quot;  delimiter=&#39;,&#39;;
+  INPUT make $ model $ mpg weight price;
+RUN;</code></pre>
+</div>
+<div id="write-the-sas-file" class="section level3 hasAnchor" number="3.1.5">
+<h3><span class="header-section-number">3.1.5</span> Write the SAS File<a href="data-management-using-sas.html#write-the-sas-file" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<pre><code>libname diss &#39;c:dissertation&#39;;
+ 
+data diss.salary;
+  input sal1996-sal2000 ;
+  cards;
+10000 10500 11000 12000 12700
+14000 16500 18000 22000 29000
+;
+run;
+
+data &#39;c:dissertationsalarylong&#39;;
+  input Salary1996-Salary2000 ;
+cards;
+10000 10500 11000 12000 12700
+14000 16500 18000 22000 29000
+;
+run;</code></pre>
+</div>
+<div id="import-csv-data" class="section level3 hasAnchor" number="3.1.6">
+<h3><span class="header-section-number">3.1.6</span> Import csv data<a href="data-management-using-sas.html#import-csv-data" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<pre><code>PROC IMPORT  datafile=&quot;Z:\path\data4.csv&quot;
+        out=outname
+        dbms=csv
+        replace;
+        delimiter=&quot;;&quot;;
+        getnames=yes;
+        Guessingrows=MAX;
+RUN;</code></pre>
+</div>
+<div id="import" class="section level3 hasAnchor" number="3.1.7">
+<h3><span class="header-section-number">3.1.7</span> %Import<a href="data-management-using-sas.html#import" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Import all SAS datasets available in a specific folder</p>
+<table>
+<colgroup>
+<col width="12%" />
+<col width="87%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Macro Variables</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>folder_path</td>
+<td>File path with the data that are to be imported;</td>
+</tr>
+<tr class="even">
+<td>delete_all</td>
+<td>If delete_all is unequal 1 then all datasets in the work-library are deleted, else if it is 1 no datasets are deleted;</td>
+</tr>
+<tr class="odd">
+<td>fname&amp;i</td>
+<td>Macro variable that contains the dataset name</td>
+</tr>
+<tr class="even">
+<td>total</td>
+<td>Number of all datasets within a folder</td>
+</tr>
+</tbody>
+</table>
+<pre><code>%macro Import (folder_path, delete_all);
+    *** delete all datasets if delete_all is 1;
+    %if &amp;delete_all ne 1 %then %do;
+        proc datasets library=work kill nolist; run; quit;
+        dm log &#39;clear&#39;;
+    %end;
+
+    libname IMPORT &quot;&amp;folder_path&quot;;
+
+    *** definition of folder with the datasets;
+    proc sql;
+        create table m_dataset_list as select distinct memname from dictionary.tables
+        where libname=&quot;IMPORT&quot; and memtype=&quot;DATA&quot;;
+    quit;
+
+    *** declare macro variables containing the name of a dataset in the specified folder and their overall number; 
+    data m_dataset_list;
+        set m_dataset_list end=last;
+        retain i 0;
+        i=i+1;
+        call symput(&#39;fname&#39;||trim(left(put(i,8.))),scan(trim(memname),1,&#39;.&#39;));
+        if last then call symput(&#39;total&#39;,trim(left(put(i,8.))));
+    run;
+
+
+    *** import by means of the macro variables defined above ; 
+    libname libdata &quot;&amp;folder_path&quot;;
+    libname library (libdata);  
+    %do i=1 %to &amp;total;
+        data work.&amp;&amp;fname&amp;i; set libdata.&amp;&amp;fname&amp;i; 
+        run;
+    %end;
+%mend Import;
+
+%Import (folder_path=Z:\...\,
+         delete_all=);</code></pre>
+</div>
+<div id="url" class="section level3 hasAnchor" number="3.1.8">
+<h3><span class="header-section-number">3.1.8</span> URL<a href="data-management-using-sas.html#url" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<pre><code>filename urlhandle url &#39;http://www.math.smith.edu/sas/testdata&#39;;
+filename urlhandle url &#39;http://www.math.smith.edu/sas/testdata&#39; 
+         user=&#39;your_username&#39; pass=&#39;your_password&#39;;
+proc import datafile=urlhandle out=ds dbms=dlm;
+run;
+</code></pre>
+</div>
+<div id="infile-read-multiple-raw-data-files" class="section level3 hasAnchor" number="3.1.9">
+<h3><span class="header-section-number">3.1.9</span> Infile Read multiple raw data files<a href="data-management-using-sas.html#infile-read-multiple-raw-data-files" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<pre><code>* data step to read in data;
+data mydata;
+  length inname $ 100;
+  input inname $;
+
+  infile dummy filevar=inname end=EOF;
+  do until (EOF);
+
+    * PUT YOUR INPUT STATEMENT HERE TO READ IN YOUR DATA;
+    input year 1-4 name $ 6-28 party $ 30-34 born 35-38 died 40-43
+          age 45-46 stborn $ 48-49 stelec $ 51-52 religion $ 54-65
+          elecvote 67-69 popvote 71-78;
+
+    * DO ANY PROCESSING OF THE DATA HERE (E.G. COMPUTING NEW VARIABLES);
+    output;
+  end;
+cards;
+c:winners1.txt
+c:winners2.txt
+run;</code></pre>
+</div>
+<div id="generate-automatic-file-name" class="section level3 hasAnchor" number="3.1.10">
+<h3><span class="header-section-number">3.1.10</span> Generate automatic file name<a href="data-management-using-sas.html#generate-automatic-file-name" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>If you create multiple data sets in SAS, you may want to name them in an automated way. How to create a file name based on date and time. Such a file naming process will 1) prevent you from providing the same file name to two different data sets, and 2) allow you to see when the file was first created.</p>
+<pre><code>data tsave;
+  do i = 1 to 10;
+    do time = 1 to 5;
+       y = rannor(1232+i + time);
+       output;
+    end;
+  end;
+run;
+
+data _null_;
+  cdate =  &quot;&amp;SYSDATE9&quot;;
+  ctime = &quot;&amp;SYSTIME&quot;;
+  time_string = cdate||&quot;_&quot;||translate(ctime, &quot;_&quot;, &quot;:&quot;);
+  call symput(&#39;mytime&#39;, time_string);
+run;
+
+data &quot;c:tempnewdata_&amp;mytime&quot;;
+  set tsave;
+run;</code></pre>
+</div>
+</div>
+<div id="format-the-variables" class="section level2 hasAnchor" number="3.2">
+<h2><span class="header-section-number">3.2</span> Format the variables<a href="data-management-using-sas.html#format-the-variables" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="proc-format" class="section level3 hasAnchor" number="3.2.1">
+<h3><span class="header-section-number">3.2.1</span> Proc format<a href="data-management-using-sas.html#proc-format" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<pre><code>proc format;
+    value eye_CAT    1 = &quot;OD&quot;
+                       2 = &quot;OS&quot;;
+      value AR_CAT     1 = &quot;^{unicode 2264} 3° absolute rotation&quot;
+                       2 = &quot;^{unicode 2264} 5° absolute rotation&quot;
+                                       3 = &quot;^{unicode 2264} 7° absolute rotation&quot;
+                                     4 = &quot;^{unicode 2264} 10° absolute rotation&quot;
+                                     5 = &quot;^{unicode 2264} 20° absolute rotation&quot;
+                                     6 = &quot;^{unicode 2264} 30° absolute rotation&quot;;
+run;</code></pre>
+</div>
+<div id="copy-and-combine-sas-format-libraries" class="section level3 hasAnchor" number="3.2.2">
+<h3><span class="header-section-number">3.2.2</span> Copy and combine SAS format libraries<a href="data-management-using-sas.html#copy-and-combine-sas-format-libraries" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<pre><code>libname first &quot;etempdata1&quot;;
+libname second &quot;etempdata2&quot;;
+
+proc catalog cat=first.FORMATS;
+  copy out=second.FORMATS;
+run;</code></pre>
+</div>
+<div id="build-a-format-from-a-dataset" class="section level3 hasAnchor" number="3.2.3">
+<h3><span class="header-section-number">3.2.3</span> Build a format from a dataset<a href="data-management-using-sas.html#build-a-format-from-a-dataset" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<pre><code>Outcode  Outname
+  101      Aberdeen
+  102      Altrincham
+  103      Ashford
+  104      Barnsley
+  105      Basildon
+  106      Basingstoke
+  107      BathFirst 
+  
+data work.outfmt(keep=start label fmtname);  
+  set work.outlets(rename=(outcode=start outname=label));  
+  fmtname=&#39;outfmt&#39;;
+run;
+proc format library=work cntlin=work.outfmt;
+run;</code></pre>
+</div>
+<div id="output-format-as-datasets" class="section level3 hasAnchor" number="3.2.4">
+<h3><span class="header-section-number">3.2.4</span> Output format as datasets<a href="data-management-using-sas.html#output-format-as-datasets" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<pre><code>proc format library=work cntlout=format_dataset;
+run;</code></pre>
+<p>,0</p>
+</div>
+<div id="delete-the-format" class="section level3 hasAnchor" number="3.2.5">
+<h3><span class="header-section-number">3.2.5</span> Delete the format<a href="data-management-using-sas.html#delete-the-format" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<pre><code>proc catalog catalog=work.formats;
+    delete eye_CAT.format Visit_CAT.format;
+run;</code></pre>
+</div>
+</div>
+<div id="array" class="section level2 hasAnchor" number="3.3">
+<h2><span class="header-section-number">3.3</span> Array<a href="data-management-using-sas.html#array" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="defining" class="section level3 hasAnchor" number="3.3.1">
+<h3><span class="header-section-number">3.3.1</span> Defining<a href="data-management-using-sas.html#defining" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p><code>array array-name {n} &lt;$&gt;&lt;length&gt; &lt;array-elements&gt; &lt;(initial-value-list)&gt;;</code></p>
+<p><span class="math display">\[
+\begin{array}{|l|l|}
+\hline \text { Component } &amp; \text { Description } \\
+\hline \text { array-name } &amp; \text { a valid SAS name that will be used to identify the group of variables } \\
+\hline \mathrm{n} &amp; \begin{array}{l}
+\text { a subscript that refers to the number of elements or variables in the array that should be enclosed in either } \\
+\text { parentheses ( ), braces }\{\} \text { , or brackets [ ] }
+\end{array} \\
+\hline \$ &amp; \text { a component added to the statement to specify that the elements within the array are of character type } \\
+\hline \text { length } &amp; \text { a common length of the elements in the array } \\
+\hline \text { array-elements } &amp; \text { a list of the variables to be part of the array that must be all the same type, either all numeric or all character } \\
+\hline \text { initial-value-list } &amp; \text { a list of initial values for each of the array elements } \\
+\hline
+\end{array}
+\]</span></p>
+<p><strong>simple examples</strong></p>
+<ul>
+<li><code>array charsamp {5} $ 10 varc1 varc2 varc3 varc4 varc5;</code></li>
+<li><code>array numsamp (*) var1 var2 var3;</code></li>
+<li><code>array initsamp [2] $ init1 init2 (‘A’, ‘B’);</code></li>
+</ul>
+<p><strong>Using Arrays in simple iterative DO loop</strong></p>
+<pre><code>do i=1 to 5;
+if numsamp[i] =. then numsamp[i] = 0;
+end;
+
+do i=1 to dim(numsamp);
+if numsamp[i] =. then numsamp[i] = 0;
+end;</code></pre>
+</div>
+<div id="format-multiple-variables" class="section level3 hasAnchor" number="3.3.2">
+<h3><span class="header-section-number">3.3.2</span> Format multiple variables<a href="data-management-using-sas.html#format-multiple-variables" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<pre><code>data sample_sae2;
+set sample_sae1;
+ array saen {*} _aesdth _aeslife _aeshosp _aesdisab _aescong _aesmie;
+ array saec {*} $1 aesdth aeslife aeshosp aesdisab aescong aesmie;
+ do i=1 to dim(saec);
+ if saen{i} = 1 then saec{i} = &#39;Y&#39;;
+ else if saen{i} = 0 then saec{i} = &#39;N&#39;;
+ end;
+run;</code></pre>
+<p>Custom Formats</p>
+<pre><code>proc format;
+value YN
+1 = &#39;Y&#39;
+0 = &#39;N&#39;;
+run;
+
+do i=1 to dim(saec);
+if ~missing(saen{i}) then saec{i} = put(saen{i},yn.);
+end;</code></pre>
+<p>Format the summary statistics</p>
+<pre><code>length contivar $200.
+               n_c mean_c  std_c    min_c   q1_c    median_c    q3_c    max_c   $100.;
+        contivar =&quot;&quot;;
+
+        array stat_num  {*} n nmiss mean    std     min     q1      median      q3      max;
+        array stat_char {*} n_c nmiss_c mean_c  std_c   min_c   q1_c    median_c    q3_c    max_c;
+        
+        *** make sure only variable no mis, otherwise variable miss is uninitialized;
+        if n ne .      then     n_c       = strip(put(round(n,1.),8.));
+        if nmiss ne .  then     nmiss_c   = strip(put(round(nmiss,1.),8.));
+        if mean ne .   then     Mean_c    = strip(put(round(mean,0.001),8.3));
+        if std ne .    then     Std_c     = strip(put(round(std,0.001),8.3));
+        if min ne .    then     Min_c     = strip(put(round(min,0.01),8.2));
+        if q1 ne .     then     Q1_c      = strip(put(round(q1,0.001),8.3));
+        if median ne . then     Median_c  = strip(put(round(median,0.001),8.3));
+        if Q3 ne .     then     Q3_c      = strip(put(round(q3,0.001),8.3));
+        if Max ne .    then     Max_c     = strip(put(round(max,0.01),8.2));
+        if nmiss ne .  then     nmiss_p   = divide (nmiss,_freq_);
+        if nmiss ne .  then     nmiss_p_c = &quot;^R/RTF&#39;\ql&#39; &quot; ||&quot; &quot; || strip(&quot;(&quot; || put(round (nmiss_p*100,0.1),5.1) || &quot;)&quot;);
+
+        do stat=1 to dim(stat_char);
+            if      stat_num[stat] ge  100 then stat_char[stat] = &quot;^R/RTF&#39;\qr&#39; &quot;      || strip(stat_char[stat]); 
+            else if stat_num[stat] ge   10 then stat_char[stat] = &quot; ^_^R/RTF&#39;\qr&#39; &quot;   || strip(stat_char[stat]); 
+            else if stat_num[stat] ge    0 then stat_char[stat] = &quot; ^_^_^R/RTF&#39;\qr&#39; &quot; || strip(stat_char[stat]); 
+            else if stat_num[stat] le -100 then stat_char[stat] = &quot;^R/RTF&#39;\qr&#39; &quot;      || strip(stat_char[stat]);
+            else if stat_num[stat] le  -10 then stat_char[stat] = &quot;^R/RTF&#39;\qr&#39; &quot;      || strip(stat_char[stat]);
+            else if stat_num[stat] ge   -1 then stat_char[stat] = &quot;^_^R/RTF&#39;\qr&#39; &quot;    || strip(stat_char[stat]);
+        end;</code></pre>
+</div>
+<div id="arrays" class="section level3 hasAnchor" number="3.3.3">
+<h3><span class="header-section-number">3.3.3</span> 2*2 arrays<a href="data-management-using-sas.html#arrays" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<pre><code>data anon_D06_glossary;
+    LENGTH  Description $200.;
+    *** 6 Groups (COLs), max. 4 Subgroups (ROWs);
+    array grps_subgrps{5,6} (       0   1   2   3   4   5
+                                    01  11  21  31  41  51
+                                    .   12  22  32  .   .
+                                    .   .   .   33  .   .
+                                    .   .   .   34  .   .);
+    do i = 1 to dim2(grps_subgrps);
+        IF grps_subgrps[1,i] EQ &amp;GROUP. THEN DO;
+            do j = 2 to dim1(grps_subgrps);
+                    if grps_subgrps[j,i] ne . then do;
+                        Description = &amp;label.;
+                        GROUP = grps_subgrps[1,i];
+                        SUBGROUP = grps_subgrps[j,i];
+                        output;
+                    end;
+            end;
+        END;
+    end;
+    drop grps_subgrps: i j;
+    set anon_D06_fmt (in = a);
+run; </code></pre>
+</div>
+<div id="dynamic-element-list-using-macro-variables" class="section level3 hasAnchor" number="3.3.4">
+<h3><span class="header-section-number">3.3.4</span> Dynamic Element List using Macro Variables<a href="data-management-using-sas.html#dynamic-element-list-using-macro-variables" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<pre><code>proc sql noprint;
+select distinct NAME into :NEWFLAGS separated by &quot; &quot;
+from dictionary.columns
+where libname = &quot;WORK&quot; and memname = &quot;SAMPLEPROC1&quot; and
+ upcase(NAME) contains &quot;_FLAG&quot;;
+quit;
+
+array newfl {*} &amp;newflags.;</code></pre>
+</div>
+</div>
+<div id="retain" class="section level2 hasAnchor" number="3.4">
+<h2><span class="header-section-number">3.4</span> Retain<a href="data-management-using-sas.html#retain" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="generate-serial-number" class="section level3 hasAnchor" number="3.4.1">
+<h3><span class="header-section-number">3.4.1</span> Generate Serial Number<a href="data-management-using-sas.html#generate-serial-number" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<pre><code>data abcd;
+input x y;
+cards;
+1 25
+1 28
+1 27
+2 23
+2 35
+2 34
+3 25
+3 29
+;
+run;
+data aaa;
+    set abcd;
+    retain z 0;
+    z = z + 1;
+run;
+
+***Cumulative Score;
+data aaa;
+  set abcd;
+  retain z 0;
+  z = z + y;
+run;
+
+***Generate Serial Number by Group;
+proc sort data = abcd; by x; run;
+data aaa;
+  set abcd;
+  retain z;
+  if first.x then z = 1;
+  else z = z + 1;
+  by x;
+run;</code></pre>
+</div>
+<div id="change-from-basilne" class="section level3 hasAnchor" number="3.4.2">
+<h3><span class="header-section-number">3.4.2</span> Change from Basilne<a href="data-management-using-sas.html#change-from-basilne" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<pre><code>data data_a;                                                                    
+            set data_b;
+            by RD_IOL_TYP subject_id eye Visit;     
+
+            *** calculate the CFB and CFM1;
+            retain baseline baseline2;
+            if first.eye then do;
+                baseline = .;
+                baseline2=.;
+            end;
+
+            if first.eye and &amp;var. ne . then do;
+                if Visit = 1 then baseline = &amp;var.;
+            end;
+
+            if VISIT = 5 and &amp;var. ne . then do;
+                baseline2 = &amp;var.;
+            end;
+
+            if &amp;var. ne . then do;
+                if baseline ne . or baseline2 ne .  then do;
+                    if VISIT = 5 and baseline ne .  then CFB1  = &amp;var. - baseline;
+                    *** split CFB off, better for report;
+                    if VISIT = 6 and baseline ne .  then CFB2  = &amp;var. - baseline;              
+                    if VISIT = 6 and baseline2 ne . then CFM1  = &amp;var. - baseline2;
+                end;
+            end;
+            keep RD_IOL_TYP subject_id eye visit &amp;var. CFB1 CFB2 CFM1 ITT PP;
+run;</code></pre>
+</div>
+</div>
+<div id="data-utilities" class="section level2 hasAnchor" number="3.5">
+<h2><span class="header-section-number">3.5</span> Data utilities<a href="data-management-using-sas.html#data-utilities" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="scan" class="section level3 hasAnchor" number="3.5.1">
+<h3><span class="header-section-number">3.5.1</span> %Scan<a href="data-management-using-sas.html#scan" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Scan function: scan(s,n,“char”) means to extract the nth string from the string string with char as the delimiter, syntax (syntax)</p>
+<ul>
+<li>scan(s,n) When n is a positive number, extract n characters from the end of the character s</li>
+<li>scan(s,n) When n is a negative number, extract n characters from the character s</li>
+<li>scan(s,n&lt;,list-of-delimiters&gt;)
+<ul>
+<li>If a delimiter is specified, only the delimiter will be extracted.</li>
+<li>If not specified, it will be split according to the commonly used delimiter. The default delimiter is: space. &lt;(+ &amp;! $ *); ^-/,% | etc. or a combination</li>
+</ul></li>
+</ul>
+<pre><code>%macro VAC;
+%MACRO HL;*** Enable editor code highlighting, delete when finalising; %MEND HL;
+    %do i = 1 %to 2;
+    %let va_cat = CDVA CDVA_dec;
+    %let var =&amp;i.;
+    %let va = %SCAN (&amp;va_cat, &amp;var);
+        data VENUS_T8_2_3_4_5_D01;
+            set VENUS_T8_2_3_4_5_D01;
+            by subject_id eye visit ;
+            
+            *** generate baseline CDVA CDVA_dec;
+            retain base_&amp;va. ;
+            if first.eye then base_&amp;va. = .;
+            if first.eye and &amp;va. ne . then do;
+                if VISIT eq 1 then base_&amp;va. = &amp;va.;
+            end;
+
+    %end;run;
+%mend VAC;
+%VAC;</code></pre>
+<pre><code>%macro mylogit1(all_deps);
+  %let k=1;
+  %let dep = %scan(&amp;all_deps, &amp;k);
+  %do %while(&quot;&amp;dep&quot; NE &quot;&quot;);
+    title &quot;dependent variable is &amp;dep&quot;;
+    proc logistic data=xxx des;
+      model &amp;dep = ind1 ind2;
+    run;
+    %let k = %eval(&amp;k + 1);
+    %let dep = %scan(&amp;all_deps, &amp;k);
+  %end;
+%mend;
+
+*run the program for the first three v&#39;s;
+%mylogit1(v1 v2 v3)
+
+
+%macro mylogita(indata, all_deps, indvars =, myout =_out );
+  %let k=1;
+  %let dep = %scan(&amp;all_deps, &amp;k);
+  %do %while(&amp;dep NE);
+    title &quot;The dependent variable is &amp;dep&quot;;
+    title2 &quot;The independent variables are &amp;indvars&quot;;
+    proc logistic data=&amp;indata des outest=est&amp;k;
+      model &amp;dep = &amp;indvars;
+    run;
+    %let k = %eval(&amp;k + 1);
+    %let dep = %scan(&amp;all_deps, &amp;k);
+  %end;
+  data &amp;myout;
+    set 
+    %do i = 1 %to &amp;k - 1;
+      est&amp;i
+    %end; 
+    ;
+  run;
+%mend;
+*run the program;
+%mylogita(xxx, v1 v2 v3, indvars = ind1 ind2, myout = myparms)
+
+title;
+proc print data = myparms;
+  var _name_ intercept ind1 ind2;
+run;</code></pre>
+</div>
+<div id="eval-and-syseval" class="section level3 hasAnchor" number="3.5.2">
+<h3><span class="header-section-number">3.5.2</span> %eval and %syseval<a href="data-management-using-sas.html#eval-and-syseval" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>The %SYSEVALF function performs floating-point arithmetic and returns a value that is formatted using the BEST32. format.</p>
+<pre><code>%let k = 1;
+%let tot = &amp;k + 1;
+%put &amp;tot;
+1 + 1
+
+%let tot = %eval(&amp;k + 1);
+%put &amp;tot;
+2
+
+%let tot = %sysevalf(&amp;k + 1.234);
+%put &amp;tot;
+2.234
+
+
+%let a = 2; 
+%let b = 2.1;
+%put The result with SYSEVALF is: %sysevalf(&amp;a + &amp;b);
+%put BOOLEAN conversion: %sysevalf(&amp;a + &amp;b, boolean);
+%put INTEGER conversion: %sysevalf(&amp;a + &amp;b, integer);
+%put CEIL conversion: %sysevalf(&amp;a +&amp;b, ceil);
+%put FLOOR conversion: %sysevalf(&amp;a +&amp;b, floor);</code></pre>
+</div>
+<div id="macro-variable-status" class="section level3 hasAnchor" number="3.5.3">
+<h3><span class="header-section-number">3.5.3</span> Macro variable status<a href="data-management-using-sas.html#macro-variable-status" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<ul>
+<li><p>%SYMEXIST: Used to judge whether a macro variable exists, and its parameter is the name of the macro variable. If the macro variable exists, it returns 1; otherwise, it returns 0.</p>
+<pre><code>%let a1=1;
+%let re1=%symexist(a1);
+%let re2=%symexist(a2);
+%put re1=&amp;re1 re2=&amp;re2;</code></pre></li>
+<li><p>%SYMGLOBL: Used to determine whether a macro variable is a global macro variable</p></li>
+</ul>
+<p><strong>Check Macro Variable</strong></p>
+<p>The DEFINED macro returns a value of 0 (false) if the argument is the name of a non-existent macro variable. It returns a 1 if the macro variable exists in the global macro environment.</p>
+<pre><code>*MVAR The name of a macro variable;
+%macro defined (mvar);
+  %local dsid rc scope;
+    /** Open the vmacro view which contains info about macor vars **/
+  %let dsid=%sysfunc(open(sashelp.vmacro (where=(name=&quot;%upcase(&amp;mvar)&quot;))));
+    /** Fetch a record into the pdv if it exists **/
+  %let rc=%sysfunc(fetch(&amp;dsid));
+    /** Return varnum 1, the scope **/
+  %let scope = %sysfunc(getvarc(&amp;dsid,1));
+    /** Close the view **/
+  %let rc=%sysfunc(close(&amp;dsid));
+  %if &amp;scope = GLOBAL %then 1; %else 0;
+%mend;
+
+%global test;
+%let test=3;
+
+%macro testit;
+    %if %defined(test)
+    %then %put TEST is defined as &amp;test;
+    %else %put TEST is undefined;
+%mend;
+
+%testit;</code></pre>
+<ul>
+<li>%SYSMACEXIST: used to judge whether a macro program exists in the Work.SASMacr catalog, if it exists, it returns 1, otherwise it returns 0.</li>
+</ul>
+</div>
+<div id="sysfunc" class="section level3 hasAnchor" number="3.5.4">
+<h3><span class="header-section-number">3.5.4</span> %SYSFUNC<a href="data-management-using-sas.html#sysfunc" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>%SYSFUNC allows one to perform nearly ever SAS function on one’s macro variables.</p>
+<pre><code>%macro procA;
+ &amp;
+%mend procA;
+%macro procB;
+ D
+%mend procB;
+
+%let D = TEST;
+%let C=%nrstr(%procB);
+%let X=%str(%procA&amp;C); 
+
+%put Y1 = %sysfunc(substr(&amp;X, 1));
+%put Y3 = %sysfunc(substr(&amp;X, 3));
+
+
+*** Solution;
+
+%procA = &amp;
+%procB = D
+&amp;D     = TEST
+&amp;C     = %nrstr(%procB) = %procB (not soloved)
+&amp;X     = %str(%procA&amp;C) = %procA&amp;C (soloved) =  &amp;%procB
+
+Y1 = %sysfunc(substr(&amp;X, 1)) = %sysfunc(substr(&amp;%procB, 1)) = &amp;%procB = &amp;D
+Y3 = %sysfunc(substr(&amp;X, 3)) = %sysfunc(substr(&amp;%procB, 3)) = procB</code></pre>
+</div>
+<div id="quoting-function" class="section level3 hasAnchor" number="3.5.5">
+<h3><span class="header-section-number">3.5.5</span> Quoting Function<a href="data-management-using-sas.html#quoting-function" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>%STR、%NRSTR、%QUOTE、%NRQUOTE、%BQUOTE、%NRBQUOTE、%SUPERQ、%UNQUOTE、%QSAN、%QSUBSTR、%QSYSFUNC、%QUPCASE</p>
+<!-- 用于屏蔽一些字符的特定功能，将其作为普通的字符来对待。例如：运算符、比较符、操作符灯，还有两个Macro Trigger：%，&。 -->
+</div>
+<div id="call-symput" class="section level3 hasAnchor" number="3.5.6">
+<h3><span class="header-section-number">3.5.6</span> Call Symput<a href="data-management-using-sas.html#call-symput" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>The Symput and symget functions can pass information to or from the data step. When we want to get the information in the data step, there are two functions that are particularly useful. You can use symput to get the information in the data step into the macro variable, and when we want to get the information from the data in the macro variable into the data step, we will use symget.</p>
+<!-- Symput和symget函数可将信息传递到数据步骤或从数据步骤传递信息 当我们想获取数据步骤中的信息时，
+有两个功能特别有用。可以使用symput将数据步骤中的信息获取到宏变量中，
+而当我们希望将信息从宏变量中的数据获取到数据步骤中时，将使用symget。 -->
+<ul>
+<li>Call symput — call symput(‘new_macro_variable’, value_in_string_format)</li>
+<li>Call symputx () will remove the spaces before and after the second parameter value</li>
+<li>symget —symget(‘macro_variable’)</li>
+</ul>
+<div id="populating-macro-variables" class="section level4 hasAnchor" number="3.5.6.1">
+<h4><span class="header-section-number">3.5.6.1</span> Populating Macro Variables<a href="data-management-using-sas.html#populating-macro-variables" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<pre><code>data _NULL_; 
+    set VENUS_analysis_sets_subj(where=(RD_IOL_TYP=1))  end=eof; 
+    if eof then call symputx(&#39;n_SESsubj_Lara&#39;,  _n_); 
+run; 
+%put &amp;n_SESsubj_Tecn.;
+
+
+
+*** A set of Macro Variables;
+data Venus_t8_2_3_5_2_Num;
+  merge Venus_t8_2_3_5_2_Means
+        Venus_t8_2_3_5_2_Num_cat;
+  by analysis_set RD_IOL_TYP subgroup visit;
+
+     if RD_IOL_TYP=1 then Treatment=&quot;LARA&quot;;
+     if RD_IOL_TYP=2 then Treatment=&quot;TECN&quot;;
+
+       if N = . then N = 0;
+
+     Name = &quot;Num&quot;|| &quot;_&quot; ||trim(Analysis_set)|| &quot;_&quot; ||trim(Treatment)|| &quot;_&quot; ||strip(subgroup)|| &quot;_&quot; ||put(visit,1.);
+
+    do _N_=1 to 240;
+     call symputx(Name,  N);
+    end;
+
+run;</code></pre>
+</div>
+<div id="sql-into" class="section level4 hasAnchor" number="3.5.6.2">
+<h4><span class="header-section-number">3.5.6.2</span> SQL into<a href="data-management-using-sas.html#sql-into" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<pre><code>/*** Using SQL ***/
+/*** One Macro Variable ***/
+
+PROC SQL;
+RESET NOPRINT;
+SELECT PUT(MEAN(height),4.1)
+INTO : avgheight
+FROM sashelp.class
+;
+RESET PRINT;
+%PUT macro variable AVGHEIGHT: [&amp;avgheight]; 
+
+
+/*** Two Macro Variables ***/
+
+PROC SQL;
+SELECT MAX(height),  MIN(height)
+INTO : max_height , : min_height
+FROM sashelp.class
+;
+QUIT;
+%PUT macro variable MAX_FNAME: [&amp;max_height];
+%PUT macro variable MIN_FNAME: [&amp;min_height];
+
+
+/*** More Variables ***/
+
+proc sql noprint;
+   select name, Population 
+      into :country1 - :country4, :pop1 - :pop3
+           from sql.countries;
+
+%put &amp;country1 &amp;pop1;
+%put &amp;country2 &amp;pop2;
+%put &amp;country3 &amp;pop3;
+%put &amp;country4;
+
+
+/***Create macro variable in string***/
+DATA _NULL_;
+    SET thirteens END=done;
+    LENGTH fname_string $ 9999;
+    RETAIN fname_string;
+    fname_string = CATX(&#39; / &#39;,fname_string,fname);
+    IF done THEN CALL SYMPUT(&#39;fnames&#39;,TRIM(fname_string) );
+RUN;
+%PUT FNAMES: [&amp;fnames]; 
+/*** Outpuit: FNAMES: [Alice / Barbara / Jeffrey] ***/
+PROC SQL;
+SELECT fname
+INTO : fnames SEPARATED BY &#39; / &#39;
+FROM thirteens
+;
+QUIT;
+%PUT FNAMES: [&amp;fnames];</code></pre>
+</div>
+</div>
+<div id="call-execute" class="section level3 hasAnchor" number="3.5.7">
+<h3><span class="header-section-number">3.5.7</span> Call Execute<a href="data-management-using-sas.html#call-execute" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="data-null" class="section level4 hasAnchor" number="3.5.7.1">
+<h4><span class="header-section-number">3.5.7.1</span> data null<a href="data-management-using-sas.html#data-null" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>Good way to replease %IF %THEN statements, %IF %THEN statements cannot appear in open code. These statements are legal but only within a macro definition</p>
+<pre><code>%if &amp;city = Boston %then %do;
+proc means data=beantown;
+var pahk youh caah;
+run;
+%end;
+%else %if &amp;city = New York %then %do;
+proc means data=big_apple;
+var a nominal egg;
+run;
+%end;
+
+
+
+
+/*CALL EXECUTE is a DATA step statement that means: “Run this code.” */
+ods html;
+data sales;
+ call execute (&#39;proc print data=sales; run;&#39;);
+ amount=5;
+run;
+
+data _null_;
+  set sales end=nomore;
+  total + amount;
+  if nomore;
+  if (total &lt; 1000000) then call execute(&#39;      
+    proc means data=sales;
+    class state;
+    var amount;
+    title &quot;Sales by State&quot;;
+    run;
+  &#39;);
+  else call execute(&#39;
+    proc means data=sales;
+    class state year;
+    var amount;
+    title &quot;Sales by State and Year&quot;;
+    run;
+  &#39;);
+run;</code></pre>
+</div>
+<div id="split-the-datasets" class="section level4 hasAnchor" number="3.5.7.2">
+<h4><span class="header-section-number">3.5.7.2</span> Split the datasets<a href="data-management-using-sas.html#split-the-datasets" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<pre><code>data _null_;
+ set sashelp.class;
+ call execute(&#39;data work.&#39;||strip(name)||&#39;;
+               set sashelp.class;
+               where name=&quot;&#39;||strip(name)||&#39;&quot;;
+               run;&#39;);
+run;
+/*First observation with name Alfred*/
+data work.Alfred;
+ set sashelp.class;
+where name=&quot;Alfred&quot;;
+run;
+/*Second observation with name Alice*/
+data work.Alice;
+ set sashelp.class;
+ where name=&quot;Alice&quot;;
+run;
+
+/*Alternative 1*/
+%macro datasets(name= );
+ data work.&amp;name;
+ set sashelp.class;
+ where name=&quot;&amp;name&quot;;
+ run;
+%mend datasets;
+data _null_;
+ set sashelp.class;
+ call execute(&#39;%datasets(name=&#39;||strip(name)||&#39;);&#39;);
+run;
+
+
+
+
+/*Alternative 2*/
+proc sql;
+ create table work.Vars as
+ select name,type
+ from dictionary.columns
+ where memname=&quot;CLASS&quot; and libname=&quot;SASHELP&quot;;
+quit;
+%macro report(var= , type= );
+ %if &amp;type=char %then %do;
+ proc freq data=sashelp.class;
+ table &amp;var;
+ run;
+ %end;
+ %else %do;
+ proc means data=sashelp.class;
+ var &amp;var;
+ run;
+ %end;
+%mend report;
+data _null_;
+ set work.Vars;
+ call execute(&#39;%report(var=&#39;||strip(name)||&#39; , type=&#39;||strip(type)||&#39;);&#39;);
+run;
+/*Code generated and executed by Call Execute:*/
+%report(var=Age ,    type=num);
+%report(var=Sex ,    type=char);
+%report(var=Age ,    type=num);
+%report(var=Height , type=num);
+%report(var=Weight , type=num);</code></pre>
+</div>
+<div id="symget" class="section level4 hasAnchor" number="3.5.7.3">
+<h4><span class="header-section-number">3.5.7.3</span> SYMGET<a href="data-management-using-sas.html#symget" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>CALL EXECUTE cannot change the currently executing DATA step. By using SYMGET, it is actually possible to work around that limitation</p>
+<pre><code>%let pet=&quot;CAT&quot;;
+data test;
+ call execute (&#39;%let pet=DOG;&#39;);
+ animal = &amp;pet.;
+ put animal;  
+run;
+ 
+%let pet=CAT;
+data test;
+ call execute (&#39;%let pet=DOG;&#39;);
+ animal = symget(&#39;pet&#39;);
+ put animal;  
+run;
+
+
+%let value = BEFORE;
+data _null_;
+  call symput(&#39;value&#39;, &#39;AFTER&#39;);
+  /* Double quotes permit resolution of &amp;VALUE during the initial phase of the DATA step*/
+  /* Double Quotes: value is BEFORE.*/
+  call execute(&quot;%put Double Quotes: value is &amp;VALUE..;&quot;);
+  call execute(&#39;%put Single Quotes: value is &amp;VALUE..;&#39;);
+run;</code></pre>
+</div>
+</div>
+<div id="sysfunc-get-the-observations" class="section level3 hasAnchor" number="3.5.8">
+<h3><span class="header-section-number">3.5.8</span> %sysfunc get the observations<a href="data-management-using-sas.html#sysfunc-get-the-observations" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<pre><code>%macro getNobsOf(data);
+proc sql noprint;
+    select count(*) into: nobs
+    from &amp;data;
+quit;
+%mend;
+
+%global nobs;
+%getNobsOf(sashelp.class);
+%put &amp;nobs;
+
+
+
+/* version 2 */
+%macro getNobsOf(data); 
+%local dsid;
+%local nobs;
+%local rc;
+
+%let dsid = %sysfunc(open(&amp;data));
+%let nobs = %sysfunc(attrn(&amp;dsid, nobs));
+%let rc   = %sysfunc(close(&amp;dsid));
+
+&amp;nobs
+%mend getNobsOf;
+
+%let nobs = %getNobsOf(sashelp.class);
+%put &amp;nobs;</code></pre>
+</div>
+</div>
+<div id="clean-up" class="section level2 hasAnchor" number="3.6">
+<h2><span class="header-section-number">3.6</span> Clean Up<a href="data-management-using-sas.html#clean-up" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="basic-setting" class="section level3 hasAnchor" number="3.6.1">
+<h3><span class="header-section-number">3.6.1</span> Basic setting<a href="data-management-using-sas.html#basic-setting" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p><strong>Cleaning OUTPUT SCREEN and LOG</strong></p>
+<pre><code>dm log &quot;clear&quot;;
+dm output &quot;clear&quot;;</code></pre>
+<p>Alternatively, you can use a different DM statement that will not only clear the output screen but will also remove any leftover “residue” in the results window.</p>
+<p><code>dm ‘odsresults’ clear;</code></p>
+<p><strong>Cleaning LIBNAME references</strong></p>
+<p><code>libname &amp;&amp;new&amp;i clear;</code></p>
+<p><strong>Cleaning TITLES and FOOTNOTES</strong></p>
+<p><code>title1; footnote1;</code></p>
+</div>
+<div id="delete-datasets" class="section level3 hasAnchor" number="3.6.2">
+<h3><span class="header-section-number">3.6.2</span> Delete datasets<a href="data-management-using-sas.html#delete-datasets" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p><strong>Deleting with PROC SQL</strong></p>
+<pre><code>proc sql;
+drop table work.Venus_t8_2_3_9_2_d03_:,  work.Venus_t8_2_3_9_2_d04_:;
+quit;</code></pre>
+<p><strong>Deleting with PROC DELETE</strong></p>
+<pre><code>proc delete data=work.Venus_t8_2_3_9_2_d03 work.Venus_t8_2_3_9_2_d04;
+run;</code></pre>
+<p><strong>Deleting with PROC Datasets</strong></p>
+<pre><code>proc datasets lib=work nolist;
+    delete Venus_t8_2_3_9_2_d03_: ;
+quit;</code></pre>
+<p><strong>Delete All Data Sets from a Library</strong></p>
+<pre><code>proc datasets library=library-name kill nolist;
+quit;</code></pre>
+</div>
+<div id="deleting-formats" class="section level3 hasAnchor" number="3.6.3">
+<h3><span class="header-section-number">3.6.3</span> Deleting Formats<a href="data-management-using-sas.html#deleting-formats" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p><strong>Delete Numeric Format</strong></p>
+<pre><code>proc format;
+    value eye
+        1 = &quot;OD&quot;
+        2 = &quot;OS&quot;;
+    value visit
+        1 =&quot;Screening&quot;
+        2 =&quot;Surgery&quot;
+        3 =&quot;D1&quot;
+        4 =&quot;W1&quot;
+        5 =&quot;M1&quot;
+        6 =&quot;M4-6&quot;
+        99 =&quot;Unscheduled&quot;;
+run;
+    
+proc catalog catalog=work.formats;
+    delete visit.format  eye.format ;
+run;</code></pre>
+<p><strong>Delete Character Format</strong></p>
+<pre><code>proc format;
+    value $ enrolled 
+        &#39;n_Screened&#39; = &#39;Screened&#39;
+        &#39;n_enrolled&#39; = &#39;Randomized&#39;
+        &#39;n_screen_failure&#39; = &#39;Randomization failure&#39;
+        &#39;n_implanted_1&#39; = &#39;1^{super st} eye implanted&#39;
+        &#39;n_implanted_2&#39; = &#39;2^{super nd} eye implanted&#39;
+        &#39;n_One_eye_eligible&#39; = &#39;Only one eligible eye&#39;
+        &#39;n_SES&#39; = &#39;Safety population&#39;
+        &#39;n_ITT&#39; = &#39;modified Intention to Treat population&#39;
+        &#39;n_PP&#39; = &#39;Per-protocol population^n&#39;
+        &#39;n_completed_study&#39; = &#39;Completed study&#39;
+        &#39;n_discontinued&#39; =&#39;Discontinued^n&#39;
+        other=[$250.];      
+run;
+
+
+proc catalog catalog=work.formats;
+    delete Enrolled.formatc;
+run;</code></pre>
+</div>
+<div id="remove-assigned-formats" class="section level3 hasAnchor" number="3.6.4">
+<h3><span class="header-section-number">3.6.4</span> Remove assigned formats<a href="data-management-using-sas.html#remove-assigned-formats" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p><strong>format <em>all</em> will delete all the formats in the SAS dataset.</strong></p>
+<pre><code>PROC DATASETS lib=work;
+MODIFY dsn;
+FORMAT _all_;
+INFORMAT _all_;
+RUN;
+QUIT;</code></pre>
+<p><strong>remove only the formats and informats of specific variables in the SAS dataset.</strong></p>
+<pre><code>Proc DataSets Lib = Work;
+Modify dsn;
+Format heigt weight sex;
+Run ;
+Quit ;</code></pre>
+<p><strong>delete formats/informats of all character or numeric variables</strong></p>
+<pre><code>proc datasets lib=work;
+modify dsn;
+format _char_; *format _num_;
+run;
+Quit;</code></pre>
+</div>
+<div id="delete-macro-variables" class="section level3 hasAnchor" number="3.6.5">
+<h3><span class="header-section-number">3.6.5</span> Delete macro variables<a href="data-management-using-sas.html#delete-macro-variables" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<pre><code>%macro deleteALL;
+    options nonotes;
+    %local vars;
+    proc sql noprint;
+             select name into: vars separated by &#39; &#39;
+              from dictionary.macros
+                      where scope=&#39;GLOBAL&#39; 
+               and not name contains &#39;SYS_SQL_IP_&#39; and not name contains (&#39;STUDY&#39;) 
+               and not name contains (&#39;REPORT&#39;) and not name contains (&#39;SPONSOR&#39;)
+               and not name contains (&#39;SYSRANDOM&#39;)
+               ;
+    quit;
+    %put &amp;vars.;
+    %symdel &amp;vars;
+ 
+    options notes;
+    %put NOTE: Macro variables deleted.;
+ 
+%mend deleteALL;</code></pre>
+<p><strong>Alternative</strong></p>
+<pre><code>proc sql noprints;
+    select name into:mymacrovars separated by &#39;&#39;
+    from dictionary.macros
+    where scope = &#39;GLOBAL&#39;;
+quit;
+%symdel &amp;mymacrovars mymacrovars;</code></pre>
+</div>
+<div id="delete-macro" class="section level3 hasAnchor" number="3.6.6">
+<h3><span class="header-section-number">3.6.6</span> Delete Macro<a href="data-management-using-sas.html#delete-macro" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p><strong>With specifying the macro</strong></p>
+<pre><code>proc catalog cat=work.sasmacr;
+    delete macro_name / et=macro;
+quit;
+
+proc catalog catalog = work.sasmacr kill force; run;</code></pre>
+<p><strong>Reset all %macro</strong></p>
+<pre><code>/****************************************************************************
+Reset all %macro: Deletes a macro definition from the Work.SASMacr catalog.;
+
+Use DELETE parameter to list macro names to delete.
+Use KEEP parameter to list macro names to NOT delete.
+Calling it with no values will delete all macros not currently running.
+****************************************************************************/
+
+
+%macro macdelete(delete,keep);
+
+%local libname memname objname objtype fid i;
+%do i=1 %to %sysmexecdepth;
+  %let keep=%sysmexecname(&amp;i) &amp;keep;
+%end;
+%if %length(&amp;delete) %then %let delete=and findw(&quot;&amp;delete&quot;,objname,&#39;,&#39;,&#39;sit&#39;);
+%let fid=%sysfunc(open( sashelp.vcatalg(keep=libname memname objname objtype
+ where=(libname=&#39;WORK&#39; and objtype=&#39;MACRO&#39; and memname like &#39;SASMAC_&#39;
+   and not findw(&quot;&amp;keep&quot;,objname,&#39;,&#39;,&#39;sit&#39;) &amp;delete))));
+%if (&amp;fid) %then %do;
+  %syscall set(fid);
+  %do %while(0=%sysfunc(fetch(&amp;fid)));
+    %put %sysfunc(compbl(Removing &amp;objname from &amp;libname catalog &amp;memname));
+    %sysmacdelete &amp;objname;
+  %end;
+  %let fid=%sysfunc(close(&amp;fid));
+%end;
+%else %put %qsysfunc(sysmsg());
+%mend macdelete;
+%macdelete;
+</code></pre>
+
+</div>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="data-management-using-r.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="references.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/Zehuibai/Data-Analyst-Tutorial/edit/main/03-Data-Management-using-SAS.Rmd",
+"text": "Edit"
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": "https://github.com/Zehuibai/Data-Analyst-Tutorial/blob/main/03-Data-Management-using-SAS.Rmd",
+"text": null
+},
+"download": null,
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

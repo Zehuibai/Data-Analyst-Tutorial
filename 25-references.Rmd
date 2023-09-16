@@ -1,0 +1,6 @@
+`r if (knitr:::is_html_output()) '
+# References {-}
+'`
+
+* [A Brief Introduction to Performing Statistical Analysis in SAS, R & Python](https://www.lexjansen.com/pharmasug/2020/SA/PharmaSUG-2020-SA-207.pdf)
+* [Practical Data Science With R](https://ninazumel.com/practical-data-science-with-r/)

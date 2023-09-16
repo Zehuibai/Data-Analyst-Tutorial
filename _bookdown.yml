@@ -1,0 +1,8 @@
+book_filename: "bookdownproj"
+output_dir: Docs
+delete_merged_file: true
+edit: https://github.com/Zehuibai/Data-Analyst-Tutorial/edit/main/%s
+view: https://github.com/Zehuibai/Data-Analyst-Tutorial/blob/main/%s
+language:
+  ui:
+    chapter_name: "Chapter "

@@ -1,0 +1,1241 @@
+# Data Management using SAS
+
+
+
+## Input data into SAS
+
+### Native datasets input
+
+```
+libname libref "dir_location";
+data ds;
+  set libref.sasfilename; /* Note: no file extension */
+  ...
+run;
+
+data ds;
+set "dir_location\sasfilename.sas7bdat"; 
+     /* Windows only */
+set "dir_location/sasfilename.sas7bdat";
+     /* works on all OS including Windows */
+run;
+```
+
+### Reading free formatted data instream
+
+```
+DATA data1;
+ INPUT make $ model $ mpg weight price;
+CARDS;
+AMC Concord 22 2930 4099
+AMC Pacer   17 3350 4749
+AMC Spirit  22 2640 3799
+Buick Century 20 3250 4816
+Buick Electra 15 4080 7827
+;
+RUN; 
+```
+
+### Reading fixed formatted data instream
+
+It need to provide the beginning and ending column numbers for each variable.
+ 
+```
+DATA data2;
+  INPUT make $ 1-5 model $ 6-12 mpg 13-14 weight 15-18 price 19-22;
+CARDS;
+AMC  Concord2229304099
+AMC  Pacer  1733504749
+AMC  Spirit 2226403799
+BuickCentury2032504816
+BuickElectra1540807827
+;
+RUN;
+```
+
+### INFILE: Reading fixed formatted data from an external file
+
+```
+The data3.dat file:
+
+AMC  Concord2229304099
+AMC  Pacer  1733504749
+AMC  Spirit 2226403799
+BuickCentury2032504816
+BuickElectra1540807827 
+
+DATA cars3;
+  INFILE "~/path/data3.dat";
+  INPUT make $ 1-5 model $ 6-12 mpg 13-14 weight 15-18 price 19-22;
+RUN;
+
+*** with special (comma) delimited
+*** tab delimited: DELIMITER='09'x;
+*** comma delimited: delimiter=',';
+
+AMC,Concord,22,2930,4099
+AMC,Pacer,17,3350,4749
+AMC,Spirit,22,2640,3799
+Buick,Century,20,3250,4816
+Buick,Electra,15,4080,7827 
+
+DATA cars5;
+  INFILE "~/path/data3.dat"  delimiter=',';
+  INPUT make $ model $ mpg weight price;
+RUN;
+```
+
+### Write the SAS File
+
+```
+libname diss 'c:dissertation';
+ 
+data diss.salary;
+  input sal1996-sal2000 ;
+  cards;
+10000 10500 11000 12000 12700
+14000 16500 18000 22000 29000
+;
+run;
+
+data 'c:dissertationsalarylong';
+  input Salary1996-Salary2000 ;
+cards;
+10000 10500 11000 12000 12700
+14000 16500 18000 22000 29000
+;
+run;
+```
+
+
+### Import csv data
+
+```
+PROC IMPORT  datafile="Z:\path\data4.csv"
+        out=outname
+        dbms=csv
+		replace;
+		delimiter=";";
+        getnames=yes;
+		Guessingrows=MAX;
+RUN;
+```
+
+### %Import
+
+Import all SAS datasets available in a specific folder
+
+| Macro Variables | Description                                                                                                            |
+|-----------------|------------------------------------------------------------------------------------------------------------------------|
+| folder_path     | File path with the data that are to be imported;                                                                       |
+| delete_all      | If delete_all is unequal 1 then all datasets in the work-library are deleted, else if it is 1 no datasets are deleted; |
+| fname&i         | Macro variable that contains the dataset name                                                                          |
+| total           | Number of all datasets within a folder                                                                                 |
+
+
+```
+%macro Import (folder_path, delete_all);
+	*** delete all datasets if delete_all is 1;
+	%if &delete_all ne 1 %then %do;
+		proc datasets library=work kill nolist; run; quit;
+		dm log 'clear';
+	%end;
+
+	libname IMPORT "&folder_path";
+
+	*** definition of folder with the datasets;
+	proc sql;
+		create table m_dataset_list as select distinct memname from dictionary.tables
+		where libname="IMPORT" and memtype="DATA";
+	quit;
+
+	*** declare macro variables containing the name of a dataset in the specified folder and their overall number; 
+	data m_dataset_list;
+		set m_dataset_list end=last;
+		retain i 0;
+		i=i+1;
+		call symput('fname'||trim(left(put(i,8.))),scan(trim(memname),1,'.'));
+		if last then call symput('total',trim(left(put(i,8.))));
+	run;
+
+
+	*** import by means of the macro variables defined above ; 
+	libname libdata "&folder_path";
+	libname library (libdata); 	
+	%do i=1 %to &total;
+		data work.&&fname&i; set libdata.&&fname&i; 
+		run;
+	%end;
+%mend Import;
+
+%Import (folder_path=Z:\...\,
+		 delete_all=);
+```
+
+### URL
+
+```
+filename urlhandle url 'http://www.math.smith.edu/sas/testdata';
+filename urlhandle url 'http://www.math.smith.edu/sas/testdata' 
+         user='your_username' pass='your_password';
+proc import datafile=urlhandle out=ds dbms=dlm;
+run;
+
+```
+
+### Infile Read multiple raw data files
+
+```
+* data step to read in data;
+data mydata;
+  length inname $ 100;
+  input inname $;
+
+  infile dummy filevar=inname end=EOF;
+  do until (EOF);
+
+    * PUT YOUR INPUT STATEMENT HERE TO READ IN YOUR DATA;
+    input year 1-4 name $ 6-28 party $ 30-34 born 35-38 died 40-43
+          age 45-46 stborn $ 48-49 stelec $ 51-52 religion $ 54-65
+          elecvote 67-69 popvote 71-78;
+
+    * DO ANY PROCESSING OF THE DATA HERE (E.G. COMPUTING NEW VARIABLES);
+    output;
+  end;
+cards;
+c:winners1.txt
+c:winners2.txt
+run;
+```
+
+### Generate automatic file name
+
+If you create multiple data sets in SAS, you may want to name them in an automated way. How to create a file name based on date and time. Such a file naming process will 1) prevent you from providing the same file name to two different data sets, and 2) allow you to see when the file was first created.
+
+```
+data tsave;
+  do i = 1 to 10;
+    do time = 1 to 5;
+	   y = rannor(1232+i + time);
+       output;
+  	end;
+  end;
+run;
+
+data _null_;
+  cdate =  "&SYSDATE9";
+  ctime = "&SYSTIME";
+  time_string = cdate||"_"||translate(ctime, "_", ":");
+  call symput('mytime', time_string);
+run;
+
+data "c:tempnewdata_&mytime";
+  set tsave;
+run;
+```
+
+
+
+
+## Format the variables
+
+### Proc format 
+
+```
+proc format;
+    value eye_CAT    1 = "OD"
+	                   2 = "OS";
+	  value AR_CAT     1 = "^{unicode 2264} 3° absolute rotation"
+	                   2 = "^{unicode 2264} 5° absolute rotation"
+									   3 = "^{unicode 2264} 7° absolute rotation"
+								     4 = "^{unicode 2264} 10° absolute rotation"
+								     5 = "^{unicode 2264} 20° absolute rotation"
+								     6 = "^{unicode 2264} 30° absolute rotation";
+run;
+```
+
+### Copy and combine SAS format libraries
+
+```
+libname first "etempdata1";
+libname second "etempdata2";
+
+proc catalog cat=first.FORMATS;
+  copy out=second.FORMATS;
+run;
+```
+
+### Build a format from a dataset
+
+```
+Outcode  Outname
+  101      Aberdeen
+  102      Altrincham
+  103      Ashford
+  104      Barnsley
+  105      Basildon
+  106      Basingstoke
+  107      BathFirst 
+  
+data work.outfmt(keep=start label fmtname);  
+  set work.outlets(rename=(outcode=start outname=label));  
+  fmtname='outfmt';
+run;
+proc format library=work cntlin=work.outfmt;
+run;
+```
+
+### Output format as datasets
+
+```
+proc format library=work cntlout=format_dataset;
+run;
+```
+,0
+
+### Delete the format
+
+```
+proc catalog catalog=work.formats;
+	delete eye_CAT.format Visit_CAT.format;
+run;
+```
+
+
+
+## Array
+
+### Defining
+
+`array array-name {n} <$><length> <array-elements> <(initial-value-list)>;`
+
+$$
+\begin{array}{|l|l|}
+\hline \text { Component } & \text { Description } \\
+\hline \text { array-name } & \text { a valid SAS name that will be used to identify the group of variables } \\
+\hline \mathrm{n} & \begin{array}{l}
+\text { a subscript that refers to the number of elements or variables in the array that should be enclosed in either } \\
+\text { parentheses ( ), braces }\{\} \text { , or brackets [ ] }
+\end{array} \\
+\hline \$ & \text { a component added to the statement to specify that the elements within the array are of character type } \\
+\hline \text { length } & \text { a common length of the elements in the array } \\
+\hline \text { array-elements } & \text { a list of the variables to be part of the array that must be all the same type, either all numeric or all character } \\
+\hline \text { initial-value-list } & \text { a list of initial values for each of the array elements } \\
+\hline
+\end{array}
+$$
+
+**simple examples**
+
+* `array charsamp {5} $ 10 varc1 varc2 varc3 varc4 varc5;`
+* `array numsamp (*) var1 var2 var3;`
+* `array initsamp [2] $ init1 init2 (‘A’, ‘B’);`
+
+**Using Arrays in simple iterative DO loop**
+
+```
+do i=1 to 5;
+if numsamp[i] =. then numsamp[i] = 0;
+end;
+
+do i=1 to dim(numsamp);
+if numsamp[i] =. then numsamp[i] = 0;
+end;
+```
+
+### Format multiple variables
+
+
+```
+data sample_sae2;
+set sample_sae1;
+ array saen {*} _aesdth _aeslife _aeshosp _aesdisab _aescong _aesmie;
+ array saec {*} $1 aesdth aeslife aeshosp aesdisab aescong aesmie;
+ do i=1 to dim(saec);
+ if saen{i} = 1 then saec{i} = 'Y';
+ else if saen{i} = 0 then saec{i} = 'N';
+ end;
+run;
+```
+
+Custom Formats
+
+```
+proc format;
+value YN
+1 = 'Y'
+0 = 'N';
+run;
+
+do i=1 to dim(saec);
+if ~missing(saen{i}) then saec{i} = put(saen{i},yn.);
+end;
+```
+
+Format the summary statistics
+
+
+```
+length contivar	$200.
+			   n_c mean_c  std_c	min_c	q1_c	median_c	q3_c	max_c	$100.;
+		contivar ="";
+
+		array stat_num	{*} n nmiss	mean 	std 	min 	q1 		median 		q3 		max;
+		array stat_char	{*} n_c nmiss_c mean_c  std_c	min_c	q1_c	median_c	q3_c	max_c;
+        
+        *** make sure only variable no mis, otherwise variable miss is uninitialized;
+		if n ne .      then		n_c 	  =	strip(put(round(n,1.),8.));
+		if nmiss ne .  then		nmiss_c	  =	strip(put(round(nmiss,1.),8.));
+		if mean ne .   then		Mean_c    = strip(put(round(mean,0.001),8.3));
+		if std ne .    then		Std_c  	  = strip(put(round(std,0.001),8.3));
+		if min ne .    then		Min_c  	  = strip(put(round(min,0.01),8.2));
+		if q1 ne .     then		Q1_c   	  = strip(put(round(q1,0.001),8.3));
+		if median ne . then		Median_c  = strip(put(round(median,0.001),8.3));
+		if Q3 ne .     then		Q3_c      = strip(put(round(q3,0.001),8.3));
+		if Max ne .    then		Max_c     = strip(put(round(max,0.01),8.2));
+		if nmiss ne .  then		nmiss_p   = divide (nmiss,_freq_);
+		if nmiss ne .  then		nmiss_p_c = "^R/RTF'\ql' " ||" " || strip("(" || put(round (nmiss_p*100,0.1),5.1) || ")");
+
+		do stat=1 to dim(stat_char);
+			if 		stat_num[stat] ge  100 then stat_char[stat] = "^R/RTF'\qr' " 	  || strip(stat_char[stat]); 
+			else if stat_num[stat] ge   10 then stat_char[stat] = " ^_^R/RTF'\qr' "   || strip(stat_char[stat]); 
+			else if stat_num[stat] ge    0 then stat_char[stat] = " ^_^_^R/RTF'\qr' " || strip(stat_char[stat]); 
+			else if stat_num[stat] le -100 then stat_char[stat] = "^R/RTF'\qr' "      || strip(stat_char[stat]);
+			else if stat_num[stat] le  -10 then stat_char[stat] = "^R/RTF'\qr' "	  || strip(stat_char[stat]);
+			else if stat_num[stat] ge   -1 then stat_char[stat] = "^_^R/RTF'\qr' "    || strip(stat_char[stat]);
+		end;
+```
+
+### 2*2 arrays
+
+```
+data anon_D06_glossary;
+	LENGTH 	Description $200.;
+	*** 6 Groups (COLs), max. 4 Subgroups (ROWs);
+	array grps_subgrps{5,6} (		0	1	2	3	4	5
+									01	11	21	31	41	51
+									.	12	22	32	.	.
+									.	.	.	33	. 	.
+									.	.	.	34	. 	.);
+	do i = 1 to dim2(grps_subgrps);
+		IF grps_subgrps[1,i] EQ &GROUP. THEN DO;
+			do j = 2 to dim1(grps_subgrps);
+					if grps_subgrps[j,i] ne . then do;
+						Description = &label.;
+						GROUP = grps_subgrps[1,i];
+						SUBGROUP = grps_subgrps[j,i];
+						output;
+					end;
+			end;
+		END;
+	end;
+	drop grps_subgrps: i j;
+	set anon_D06_fmt (in = a);
+run; 
+```
+
+### Dynamic Element List using Macro Variables
+
+```
+proc sql noprint;
+select distinct NAME into :NEWFLAGS separated by " "
+from dictionary.columns
+where libname = "WORK" and memname = "SAMPLEPROC1" and
+ upcase(NAME) contains "_FLAG";
+quit;
+
+array newfl {*} &newflags.;
+```
+
+ 
+ 
+
+
+## Retain
+
+### Generate Serial Number
+
+```
+data abcd;
+input x y;
+cards;
+1 25
+1 28
+1 27
+2 23
+2 35
+2 34
+3 25
+3 29
+;
+run;
+data aaa;
+	set abcd;
+	retain z 0;
+	z = z + 1;
+run;
+
+***Cumulative Score;
+data aaa;
+  set abcd;
+  retain z 0;
+  z = z + y;
+run;
+
+***Generate Serial Number by Group;
+proc sort data = abcd; by x; run;
+data aaa;
+  set abcd;
+  retain z;
+  if first.x then z = 1;
+  else z = z + 1;
+  by x;
+run;
+``` 
+ 
+
+
+### Change from Basilne
+
+```
+data data_a;																	
+			set data_b;
+			by RD_IOL_TYP subject_id eye Visit;		
+
+	        *** calculate the CFB and CFM1;
+			retain baseline baseline2;
+			if first.eye then do;
+				baseline = .;
+				baseline2=.;
+			end;
+
+			if first.eye and &var. ne . then do;
+				if Visit = 1 then baseline = &var.;
+			end;
+
+			if VISIT = 5 and &var. ne . then do;
+				baseline2 = &var.;
+			end;
+
+			if &var. ne . then do;
+				if baseline ne . or baseline2 ne .  then do;
+					if VISIT = 5 and baseline ne .  then CFB1  = &var. - baseline;
+					*** split CFB off, better for report;
+					if VISIT = 6 and baseline ne .  then CFB2  = &var. - baseline;				
+					if VISIT = 6 and baseline2 ne . then CFM1  = &var. - baseline2;
+				end;
+			end;
+			keep RD_IOL_TYP subject_id eye visit &var. CFB1 CFB2 CFM1 ITT PP;
+run;
+```
+
+
+ 
+   
+
+
+## Data utilities
+
+### %Scan
+
+Scan function: scan(s,n,"char") means to extract the nth string from the string string with char as the delimiter, syntax (syntax)
+
+* scan(s,n) When n is a positive number, extract n characters from the end of the character s
+* scan(s,n) When n is a negative number, extract n characters from the character s
+* scan(s,n<,list-of-delimiters>)
+    + If a delimiter is specified, only the delimiter will be extracted.
+    + If not specified, it will be split according to the commonly used delimiter. The default delimiter is: space. <(+ &! $ *); ^-/,% | etc. or a combination
+
+```
+%macro VAC;
+%MACRO HL;*** Enable editor code highlighting, delete when finalising; %MEND HL;
+	%do i = 1 %to 2;
+	%let va_cat = CDVA CDVA_dec;
+	%let var =&i.;
+	%let va = %SCAN (&va_cat, &var);
+		data VENUS_T8_2_3_4_5_D01;
+			set VENUS_T8_2_3_4_5_D01;
+			by subject_id eye visit ;
+            
+			*** generate baseline CDVA CDVA_dec;
+			retain base_&va. ;
+			if first.eye then base_&va. = .;
+			if first.eye and &va. ne . then do;
+				if VISIT eq 1 then base_&va. = &va.;
+			end;
+
+	%end;run;
+%mend VAC;
+%VAC;
+```
+
+```
+%macro mylogit1(all_deps);
+  %let k=1;
+  %let dep = %scan(&all_deps, &k);
+  %do %while("&dep" NE "");
+    title "dependent variable is &dep";
+    proc logistic data=xxx des;
+      model &dep = ind1 ind2;
+    run;
+    %let k = %eval(&k + 1);
+    %let dep = %scan(&all_deps, &k);
+  %end;
+%mend;
+
+*run the program for the first three v's;
+%mylogit1(v1 v2 v3)
+
+
+%macro mylogita(indata, all_deps, indvars =, myout =_out );
+  %let k=1;
+  %let dep = %scan(&all_deps, &k);
+  %do %while(&dep NE);
+    title "The dependent variable is &dep";
+    title2 "The independent variables are &indvars";
+    proc logistic data=&indata des outest=est&k;
+      model &dep = &indvars;
+    run;
+    %let k = %eval(&k + 1);
+    %let dep = %scan(&all_deps, &k);
+  %end;
+  data &myout;
+    set 
+    %do i = 1 %to &k - 1;
+      est&i
+    %end; 
+    ;
+  run;
+%mend;
+*run the program;
+%mylogita(xxx, v1 v2 v3, indvars = ind1 ind2, myout = myparms)
+
+title;
+proc print data = myparms;
+  var _name_ intercept ind1 ind2;
+run;
+```
+
+
+### %eval and %syseval
+
+The %SYSEVALF function performs floating-point arithmetic and returns a value that is formatted using the BEST32. format.
+
+```
+%let k = 1;
+%let tot = &k + 1;
+%put &tot;
+1 + 1
+
+%let tot = %eval(&k + 1);
+%put &tot;
+2
+
+%let tot = %sysevalf(&k + 1.234);
+%put &tot;
+2.234
+
+
+%let a = 2; 
+%let b = 2.1;
+%put The result with SYSEVALF is: %sysevalf(&a + &b);
+%put BOOLEAN conversion: %sysevalf(&a + &b, boolean);
+%put INTEGER conversion: %sysevalf(&a + &b, integer);
+%put CEIL conversion: %sysevalf(&a +&b, ceil);
+%put FLOOR conversion: %sysevalf(&a +&b, floor);
+```
+
+### Macro variable status
+
+* %SYMEXIST: Used to judge whether a macro variable exists, and its parameter is the name of the macro variable. If the macro variable exists, it returns 1; otherwise, it returns 0.
+
+
+      %let a1=1;
+      %let re1=%symexist(a1);
+      %let re2=%symexist(a2);
+      %put re1=&re1 re2=&re2;
+
+* %SYMGLOBL: Used to determine whether a macro variable is a global macro variable
+
+**Check Macro Variable**
+
+The DEFINED macro returns a value of 0 (false) if the argument is the name of a non-existent macro variable. It returns a 1 if the macro variable exists in the global macro environment.
+
+```
+*MVAR The name of a macro variable;
+%macro defined (mvar);
+  %local dsid rc scope;
+  	/** Open the vmacro view which contains info about macor vars **/
+  %let dsid=%sysfunc(open(sashelp.vmacro (where=(name="%upcase(&mvar)"))));
+  	/** Fetch a record into the pdv if it exists **/
+  %let rc=%sysfunc(fetch(&dsid));
+  	/** Return varnum 1, the scope **/
+  %let scope = %sysfunc(getvarc(&dsid,1));
+  	/** Close the view **/
+  %let rc=%sysfunc(close(&dsid));
+  %if &scope = GLOBAL %then 1; %else 0;
+%mend;
+
+%global test;
+%let test=3;
+
+%macro testit;
+	%if %defined(test)
+	%then %put TEST is defined as &test;
+	%else %put TEST is undefined;
+%mend;
+
+%testit;
+```
+
+* %SYSMACEXIST: used to judge whether a macro program exists in the Work.SASMacr catalog, if it exists, it returns 1, otherwise it returns 0.
+
+
+### %SYSFUNC
+
+ %SYSFUNC allows one to perform nearly ever SAS function on one's macro variables.
+ 
+```
+%macro procA;
+ &
+%mend procA;
+%macro procB;
+ D
+%mend procB;
+
+%let D = TEST;
+%let C=%nrstr(%procB);
+%let X=%str(%procA&C); 
+
+%put Y1 = %sysfunc(substr(&X, 1));
+%put Y3 = %sysfunc(substr(&X, 3));
+
+
+*** Solution;
+
+%procA = &
+%procB = D
+&D     = TEST
+&C     = %nrstr(%procB) = %procB (not soloved)
+&X     = %str(%procA&C) = %procA&C (soloved) =  &%procB
+
+Y1 = %sysfunc(substr(&X, 1)) = %sysfunc(substr(&%procB, 1)) = &%procB = &D
+Y3 = %sysfunc(substr(&X, 3)) = %sysfunc(substr(&%procB, 3)) = procB
+```
+
+### Quoting Function
+
+%STR、%NRSTR、%QUOTE、%NRQUOTE、%BQUOTE、%NRBQUOTE、%SUPERQ、%UNQUOTE、%QSAN、%QSUBSTR、%QSYSFUNC、%QUPCASE
+
+<!-- 用于屏蔽一些字符的特定功能，将其作为普通的字符来对待。例如：运算符、比较符、操作符灯，还有两个Macro Trigger：%，&。 -->
+
+
+### Call Symput
+
+The Symput and symget functions can pass information to or from the data step. When we want to get the information in the data step, there are two functions that are particularly useful. You can use symput to get the information in the data step into the macro variable, and when we want to get the information from the data in the macro variable into the data step, we will use symget.
+
+<!-- Symput和symget函数可将信息传递到数据步骤或从数据步骤传递信息 当我们想获取数据步骤中的信息时，
+有两个功能特别有用。可以使用symput将数据步骤中的信息获取到宏变量中，
+而当我们希望将信息从宏变量中的数据获取到数据步骤中时，将使用symget。 -->
+
+* Call symput — call symput(‘new_macro_variable’, value_in_string_format)
+* Call symputx () will remove the spaces before and after the second parameter value
+* symget —symget(‘macro_variable’)
+ 
+#### Populating Macro Variables
+
+```
+data _NULL_; 
+	set VENUS_analysis_sets_subj(where=(RD_IOL_TYP=1))  end=eof; 
+	if eof then call symputx('n_SESsubj_Lara',  _n_); 
+run; 
+%put &n_SESsubj_Tecn.;
+
+
+
+*** A set of Macro Variables;
+data Venus_t8_2_3_5_2_Num;
+  merge Venus_t8_2_3_5_2_Means
+        Venus_t8_2_3_5_2_Num_cat;
+  by analysis_set RD_IOL_TYP subgroup visit;
+
+     if RD_IOL_TYP=1 then Treatment="LARA";
+     if RD_IOL_TYP=2 then Treatment="TECN";
+
+	   if N = . then N = 0;
+
+     Name = "Num"|| "_" ||trim(Analysis_set)|| "_" ||trim(Treatment)|| "_" ||strip(subgroup)|| "_" ||put(visit,1.);
+
+    do _N_=1 to 240;
+     call symputx(Name,  N);
+    end;
+
+run;
+```
+
+#### SQL into
+
+```
+/*** Using SQL ***/
+/*** One Macro Variable ***/
+
+PROC SQL;
+RESET NOPRINT;
+SELECT PUT(MEAN(height),4.1)
+INTO : avgheight
+FROM sashelp.class
+;
+RESET PRINT;
+%PUT macro variable AVGHEIGHT: [&avgheight]; 
+
+
+/*** Two Macro Variables ***/
+
+PROC SQL;
+SELECT MAX(height),  MIN(height)
+INTO : max_height , : min_height
+FROM sashelp.class
+;
+QUIT;
+%PUT macro variable MAX_FNAME: [&max_height];
+%PUT macro variable MIN_FNAME: [&min_height];
+
+
+/*** More Variables ***/
+
+proc sql noprint;
+   select name, Population 
+      into :country1 - :country4, :pop1 - :pop3
+           from sql.countries;
+
+%put &country1 &pop1;
+%put &country2 &pop2;
+%put &country3 &pop3;
+%put &country4;
+
+
+/***Create macro variable in string***/
+DATA _NULL_;
+	SET thirteens END=done;
+	LENGTH fname_string $ 9999;
+	RETAIN fname_string;
+	fname_string = CATX(' / ',fname_string,fname);
+	IF done THEN CALL SYMPUT('fnames',TRIM(fname_string) );
+RUN;
+%PUT FNAMES: [&fnames]; 
+/*** Outpuit: FNAMES: [Alice / Barbara / Jeffrey] ***/
+PROC SQL;
+SELECT fname
+INTO : fnames SEPARATED BY ' / '
+FROM thirteens
+;
+QUIT;
+%PUT FNAMES: [&fnames];
+```
+
+
+### Call Execute
+
+#### data null
+
+Good way to replease  %IF %THEN statements, %IF %THEN statements cannot appear in open code. These statements are legal but only within a macro definition
+
+```
+%if &city = Boston %then %do;
+proc means data=beantown;
+var pahk youh caah;
+run;
+%end;
+%else %if &city = New York %then %do;
+proc means data=big_apple;
+var a nominal egg;
+run;
+%end;
+
+
+
+
+/*CALL EXECUTE is a DATA step statement that means: “Run this code.” */
+ods html;
+data sales;
+ call execute ('proc print data=sales; run;');
+ amount=5;
+run;
+
+data _null_;
+  set sales end=nomore;
+  total + amount;
+  if nomore;
+  if (total < 1000000) then call execute('		
+    proc means data=sales;
+    class state;
+    var amount;
+    title "Sales by State";
+    run;
+  ');
+  else call execute('
+    proc means data=sales;
+    class state year;
+    var amount;
+    title "Sales by State and Year";
+    run;
+  ');
+run;
+```
+
+
+#### Split the datasets
+
+```
+data _null_;
+ set sashelp.class;
+ call execute('data work.'||strip(name)||';
+               set sashelp.class;
+               where name="'||strip(name)||'";
+               run;');
+run;
+/*First observation with name Alfred*/
+data work.Alfred;
+ set sashelp.class;
+where name="Alfred";
+run;
+/*Second observation with name Alice*/
+data work.Alice;
+ set sashelp.class;
+ where name="Alice";
+run;
+
+/*Alternative 1*/
+%macro datasets(name= );
+ data work.&name;
+ set sashelp.class;
+ where name="&name";
+ run;
+%mend datasets;
+data _null_;
+ set sashelp.class;
+ call execute('%datasets(name='||strip(name)||');');
+run;
+
+
+
+
+/*Alternative 2*/
+proc sql;
+ create table work.Vars as
+ select name,type
+ from dictionary.columns
+ where memname="CLASS" and libname="SASHELP";
+quit;
+%macro report(var= , type= );
+ %if &type=char %then %do;
+ proc freq data=sashelp.class;
+ table &var;
+ run;
+ %end;
+ %else %do;
+ proc means data=sashelp.class;
+ var &var;
+ run;
+ %end;
+%mend report;
+data _null_;
+ set work.Vars;
+ call execute('%report(var='||strip(name)||' , type='||strip(type)||');');
+run;
+/*Code generated and executed by Call Execute:*/
+%report(var=Age ,    type=num);
+%report(var=Sex ,    type=char);
+%report(var=Age ,    type=num);
+%report(var=Height , type=num);
+%report(var=Weight , type=num);
+```
+
+
+#### SYMGET
+
+CALL EXECUTE cannot change the currently executing DATA step. By using SYMGET, it is actually possible to work around that limitation
+
+```
+%let pet="CAT";
+data test;
+ call execute ('%let pet=DOG;');
+ animal = &pet.;
+ put animal;  
+run;
+ 
+%let pet=CAT;
+data test;
+ call execute ('%let pet=DOG;');
+ animal = symget('pet');
+ put animal;  
+run;
+
+
+%let value = BEFORE;
+data _null_;
+  call symput('value', 'AFTER');
+  /* Double quotes permit resolution of &VALUE during the initial phase of the DATA step*/
+  /* Double Quotes: value is BEFORE.*/
+  call execute("%put Double Quotes: value is &VALUE..;");
+  call execute('%put Single Quotes: value is &VALUE..;');
+run;
+```
+
+
+ 
+
+### %sysfunc get the observations
+
+```
+%macro getNobsOf(data);
+proc sql noprint;
+	select count(*) into: nobs
+	from &data;
+quit;
+%mend;
+
+%global nobs;
+%getNobsOf(sashelp.class);
+%put &nobs;
+
+
+
+/* version 2 */
+%macro getNobsOf(data); 
+%local dsid;
+%local nobs;
+%local rc;
+
+%let dsid = %sysfunc(open(&data));
+%let nobs = %sysfunc(attrn(&dsid, nobs));
+%let rc   = %sysfunc(close(&dsid));
+
+&nobs
+%mend getNobsOf;
+
+%let nobs = %getNobsOf(sashelp.class);
+%put &nobs;
+```
+ 
+
+## Clean Up
+
+### Basic setting
+
+
+**Cleaning OUTPUT SCREEN and LOG**
+
+```
+dm log "clear";
+dm output "clear";
+```
+Alternatively, you can use a different DM statement that will not only clear the output screen but will also remove any leftover “residue” in the results window.
+
+`dm ‘odsresults’ clear;`
+
+**Cleaning LIBNAME references**
+
+`libname &&new&i clear;`
+ 
+**Cleaning TITLES and FOOTNOTES**
+
+`title1; footnote1;`
+
+### Delete datasets
+
+**Deleting with PROC SQL**
+
+```
+proc sql;
+drop table work.Venus_t8_2_3_9_2_d03_:,  work.Venus_t8_2_3_9_2_d04_:;
+quit;
+```
+
+**Deleting with PROC DELETE**
+
+```
+proc delete data=work.Venus_t8_2_3_9_2_d03 work.Venus_t8_2_3_9_2_d04;
+run;
+```
+
+**Deleting with PROC Datasets**
+
+```
+proc datasets lib=work nolist;
+	delete Venus_t8_2_3_9_2_d03_: ;
+quit;
+```
+
+**Delete All Data Sets from a Library**
+
+```
+proc datasets library=library-name kill nolist;
+quit;
+```
+
+### Deleting Formats
+
+**Delete Numeric Format**
+
+```
+proc format;
+	value eye
+		1 = "OD"
+		2 = "OS";
+	value visit
+		1 ="Screening"
+		2 ="Surgery"
+		3 ="D1"
+		4 ="W1"
+		5 ="M1"
+		6 ="M4-6"
+		99 ="Unscheduled";
+run;
+	
+proc catalog catalog=work.formats;
+	delete visit.format  eye.format ;
+run;
+```
+
+**Delete Character Format**
+
+```
+proc format;
+	value $ enrolled 
+		'n_Screened' = 'Screened'
+		'n_enrolled' = 'Randomized'
+		'n_screen_failure' = 'Randomization failure'
+		'n_implanted_1' = '1^{super st} eye implanted'
+		'n_implanted_2' = '2^{super nd} eye implanted'
+		'n_One_eye_eligible' = 'Only one eligible eye'
+		'n_SES' = 'Safety population'
+		'n_ITT' = 'modified Intention to Treat population'
+		'n_PP' = 'Per-protocol population^n'
+		'n_completed_study' = 'Completed study'
+		'n_discontinued' ='Discontinued^n'
+		other=[$250.];		
+run;
+
+
+proc catalog catalog=work.formats;
+	delete Enrolled.formatc;
+run;
+```
+
+### Remove assigned formats
+
+**format _all_ will delete all the formats in the SAS dataset.**
+
+```
+PROC DATASETS lib=work;
+MODIFY dsn;
+FORMAT _all_;
+INFORMAT _all_;
+RUN;
+QUIT;
+```
+
+**remove only the formats and informats of specific variables in the SAS dataset.**
+
+```
+Proc DataSets Lib = Work;
+Modify dsn;
+Format heigt weight sex;
+Run ;
+Quit ;
+```
+
+**delete formats/informats of all character or numeric variables**
+
+```
+proc datasets lib=work;
+modify dsn;
+format _char_; *format _num_;
+run;
+Quit;
+```
+
+
+### Delete macro variables
+
+```
+%macro deleteALL;
+   	options nonotes;
+  	%local vars;
+  	proc sql noprint;
+      	     select name into: vars separated by ' '
+         	  from dictionary.macros
+            	      where scope='GLOBAL' 
+			   and not name contains 'SYS_SQL_IP_' and not name contains ('STUDY') 
+			   and not name contains ('REPORT') and not name contains ('SPONSOR')
+			   and not name contains ('SYSRANDOM')
+			   ;
+   	quit;
+ 	%put &vars.;
+   	%symdel &vars;
+ 
+   	options notes;
+   	%put NOTE: Macro variables deleted.;
+ 
+%mend deleteALL;
+```
+
+**Alternative**
+
+```
+proc sql noprints;
+    select name into:mymacrovars separated by ''
+	from dictionary.macros
+	where scope = 'GLOBAL';
+quit;
+%symdel &mymacrovars mymacrovars;
+```
+
+### Delete Macro
+
+**With specifying the macro**
+
+```
+proc catalog cat=work.sasmacr;
+    delete macro_name / et=macro;
+quit;
+
+proc catalog catalog = work.sasmacr kill force; run;
+```
+
+**Reset all %macro**
+
+```
+/****************************************************************************
+Reset all %macro: Deletes a macro definition from the Work.SASMacr catalog.;
+
+Use DELETE parameter to list macro names to delete.
+Use KEEP parameter to list macro names to NOT delete.
+Calling it with no values will delete all macros not currently running.
+****************************************************************************/
+
+
+%macro macdelete(delete,keep);
+
+%local libname memname objname objtype fid i;
+%do i=1 %to %sysmexecdepth;
+  %let keep=%sysmexecname(&i) &keep;
+%end;
+%if %length(&delete) %then %let delete=and findw("&delete",objname,',','sit');
+%let fid=%sysfunc(open( sashelp.vcatalg(keep=libname memname objname objtype
+ where=(libname='WORK' and objtype='MACRO' and memname like 'SASMAC_'
+   and not findw("&keep",objname,',','sit') &delete))));
+%if (&fid) %then %do;
+  %syscall set(fid);
+  %do %while(0=%sysfunc(fetch(&fid)));
+    %put %sysfunc(compbl(Removing &objname from &libname catalog &memname));
+    %sysmacdelete &objname;
+  %end;
+  %let fid=%sysfunc(close(&fid));
+%end;
+%else %put %qsysfunc(sysmsg());
+%mend macdelete;
+%macdelete;
+
+```
