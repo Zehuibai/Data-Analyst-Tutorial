@@ -1,0 +1,175 @@
+---
+title: "Übungsblatt 8 - Hausaufgaben"
+author: "Zehui Bai,Stefanie Do"
+date: "`r Sys.time()`"
+output: 
+  html_document: 
+    df_print: kable
+    toc: yes
+    toc_depth: 4
+    toc_float: yes
+    code_folding: show
+editor_options:
+  chunk_output_type: console
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE, error = FALSE)
+```
+
+# ~~Aufgage~~ Aufgabe 1
+
+```{r aufgabe 1}
+## p-Wert von 1 ist nicht signifikant und deutet auf ein gezinktes Roulette-Rad hin, siehe z.B. probablity of success 1.
+
+binom.test(5, 5, 18/37, alternative="less")
+```
+
+---
+
+**Korrektur:** 18/37 ist Gewinnwahrscheinlichkeit. Also muss Anzahl der Gewinne (0) übergeben werden, nicht Anzahl der Verluste (5):
+```{r}
+binom.test(0, 5, 18/37, alternative="less")
+```
+
+---
+
+```{r}
+## p-Wert von 0.01134 ist signifikant und deutet auf ein normales Roulette-Rad hin.
+
+binom.test(450, 1000, 18/37, alternative="less") 
+```
+
+---
+
+**Bewertung:** 5/6
+
+---
+
+# ~~Aufgage~~ Aufgabe 2
+
+```{r}
+# a 
+# die Chance, den vermuteten Effekt von ca. 5% nachweisen zu können, ist 0.2863701
+p <- qbinom(p=0.95,size=100,prob=0.7)
+1-pbinom(q=p,size=100,prob=0.75)
+
+# b
+# der vermutete Effekt ist mindestens 0.14*100% =14%,um (mit n = 100) eine Power von 0.95 zu erreichen
+Effekt <- 0
+repeat{
+  Effekt <- Effekt+0.01  
+  k <- qbinom(p=0.95,size=100,prob=0.7)
+  p <- 1-pbinom(q=k,size=100,prob=(Effekt+0.7))
+  if(p >= 0.95) {
+    break } 
+  }
+Effekt
+
+# c
+# der Stichprobenumfang mindestens ist mindestens 22515, um einen vermuteten Effekt von 1% mit einer Power von 0.95 nachweisen zu können
+n <- 1
+repeat{
+  n <- n+1  
+  k <- qbinom(p=0.95,size=n,prob=0.7)
+  p <- 1-pbinom(q=k,size=n,prob=(0.01+0.7))
+  if(p >= 0.95) {
+    break } 
+  }
+n
+```
+
+---
+
+**Bewertung:** 10/10
+
+---
+
+# Aufgabe 3
+
+```{r}
+Power_Monte_Carlo <- function(N,Samplesize){
+  Index <- NULL
+  for (i in 1:N) {
+    Y <- rbinom(n=Samplesize, size=1, prob=0.4)
+    Test <- binom.test(sum(Y), length(Y), 0.3, alternative="two.sided") 
+    Index[i] <-  ifelse(Test$p.value>0.05,0,1)
+  }
+  M <- sum(Index)
+  Power <- M/N
+  return(Power)
+}
+# Experiment n = 40, p0 = 0.3, p1 = 0.4, α = 0.05
+Power_Monte_Carlo(N=10000,Samplesize=40)
+# Experiment n = 200, p0 = 0.3, p1 = 0.4, α = 0.05
+Power_Monte_Carlo(N=10000,Samplesize=200)
+```
+
+---
+
+**Korrektur:** Laut Angabe oberer Binomialtest, also `alternative="greater"`:
+
+```{r}
+Power_Monte_Carlo <- function(N,Samplesize){
+  Index <- NULL
+  for (i in 1:N) {
+    Y <- rbinom(n=Samplesize, size=1, prob=0.4)
+    Test <- binom.test(sum(Y), length(Y), 0.3, alternative="greater") 
+    Index[i] <-  ifelse(Test$p.value>0.05,0,1)
+  }
+  M <- sum(Index)
+  Power <- M/N
+  return(Power)
+}
+Power_Monte_Carlo(N=10000,Samplesize=40)
+Power_Monte_Carlo(N=10000,Samplesize=200)
+```
+
+
+**Bewertung:** 3/4
+
+---
+
+# Zusatzaufgabe
+
+```{r}
+powerfkt1 <- function(alpha=0.05, p0=0.3, delta=0.1,
+                      nstart=25, nend=1000, nstep=25){
+  n <- seq(nstart, nend, nstep)
+  power <- NULL 
+  alpha.act <- NULL
+  c <- qbinom(p=1-alpha, size=n, prob=p0)
+  alpha.act <- 1-pbinom(c, n, p0)
+  power <- 1-pbinom(q=c, size=n, prob=p0+delta)
+  x <- data.frame(n, power, alpha.act)
+  return(x)
+}
+b <- powerfkt1()
+
+library(knitr)
+library(kableExtra)
+kable(b) %>%
+  kable_styling() %>%
+  scroll_box(width = "500px", height = "200px")
+```
+
+---
+
+**Korrektur:** Header ist nicht wie gewünscht- -- Es soll nur die Argumente `alpha`, `p0`, `delta` und `n` berücksichtigt werden (kein `nstart, `nend` oder `nstep`):
+```{r}
+power1 <- function(alpha=0.05, p0=0.3, delta=0.1, n){
+  k <- qbinom(p=1-alpha, size=n, prob=p0)
+  alpha.act <- 1-pbinom(k, n, p0)
+  power <- 1-pbinom(q=k, size=n, prob=p0+delta)
+  
+  return(data.frame(n, power, alpha.act))
+}
+# Beispiel:
+power1(n=seq(25, 100, 25))
+```
+
+**Bewertung:** 2.5/3
+
+**Insgesamt:** 20.5 Punkte
+
+---

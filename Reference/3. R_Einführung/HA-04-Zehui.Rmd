@@ -1,0 +1,250 @@
+ ---
+title: "Aufgabe 4"
+subject: "R Einführung"
+author: "Zehui Bai, Stefanie Do"
+date: "`r Sys.time()`"
+fontsize: 10pt
+colorlinks: yes
+boldstyle: TeX
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    df_print: paged
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(readr)
+library(dplyr)
+```
+
+
+## Aufgabe 1
+
+#### (a+b)
+>Laden Sie den Datensatz iris aus dem Paket datasets. Und rufen Sie mit dem entsprechenden R-Befehl die Hilfe zum Datensatz auf und lesen Sie die Informationen zu diesem Datensatz.
+
+```{r echo=TRUE}
+data(iris)
+iris <- data.frame(iris)
+```
+
+---
+
+**Korrektur:*** Aufgabe b) fehlt: `?iris`
+
+---
+
+#### (c)
+>Berechnen Sie die Mittelwerte der 4 metrisch-skalierten Merkmale des Datensatzes gruppiert nach dem qualitativen Merkmal Species. Benutzen Sie dazu die Funktion tapply().
+
+```{r echo=TRUE}
+levels(iris$Species)
+tapply(iris$Sepal.Length, iris$Species, mean)
+tapply(iris$Sepal.Width,  iris$Species, mean)
+tapply(iris$Petal.Length, iris$Species, mean)
+tapply(iris$Petal.Width,  iris$Species, mean)
+```
+
+#### (d)
+>Lösen Sie Teilaufgabe c) diesmal mit aggregate().
+
+```{r echo=TRUE}
+aggregate(iris[,1:4],list(iris$Species), mean)
+```
+
+---
+
+**Bewertung:** 3/4
+
+---
+
+## Aufgabe 2
+
+#### (a)
+>Im Folgenden benötigten Sie den Datensatz heartatk4R.txt (verfügbar unter http://statland.org/R/R/heartatk4R.txt). Laden Sie den Datensatz direkt unter Angabe der URL als Dateiname in R ein.
+
+```{r echo=TRUE}
+library(readr)
+heartatk4 <- read_delim("http://statland.org/R/R/heartatk4R.txt", delim = "\t", col_types = cols(
+  Patient = col_integer(),
+  DIAGNOSIS = col_integer(),
+  SEX = col_character(),
+  DRG = col_integer(),
+  DIED = col_integer(),
+  CHARGES = col_double(),
+  LOS = col_integer(),
+  AGE = col_integer()
+))
+```
+
+```{r echo=TRUE}
+# Alternative
+heartatk4_alternativ <- read.csv("http://statland.org/R/R/heartatk4R.txt", sep="")
+```
+
+#### (b)
+>Berechnen Sie den Mittelwert des Alters der Patienten gruppiert nach jeweils SEX, DIAGNOSIS, DRG und DIED.
+
+```{r echo=TRUE}
+lapply(c("SEX", "DIAGNOSIS", "DRG", "DIED"), function(x) {
+  tapply(heartatk4$AGE, heartatk4[x], mean, na.rm = TRUE)
+})
+```
+
+#### (c)
+>Die Krankenhausaufenthaltskosten für jeden Patienten sind in der Spalte CHARGES ange- geben. Berechnen Sie den Mittelwert der Kosten gruppiert nach jeweils SEX, DIAGNOSIS, DRG und DIED. Kommentieren Sie knapp wo die größten Kosten entstehen!
+
+```{r echo=TRUE}
+Aufgabe_2c <- lapply(c("SEX", "DIAGNOSIS", "DRG", "DIED"), function(x) {
+  tapply(heartatk4$CHARGES, heartatk4[x], mean, na.rm = TRUE)
+})
+# die Maxima nach jeweils SEX, DIAGNOSIS, DRG und DIED
+wert_max <- lapply(Aufgabe_2c,max)
+wo_max <- lapply(Aufgabe_2c,which.max)
+name_max <- lapply(wo_max,names)
+cbind(name_max, wert_max)
+```
+
+---
+
+**Kommentar:** Gut. Der Output sieht noch etwas besser aus, wenn das erste `lapply` durch `sapply` ersetzt wird:
+```{r echo=TRUE}
+Aufgabe_2c <- sapply(c("SEX", "DIAGNOSIS", "DRG", "DIED"), function(x) {
+  tapply(heartatk4$CHARGES, heartatk4[x], mean, na.rm = TRUE)
+})
+# die Maxima nach jeweils SEX, DIAGNOSIS, DRG und DIED
+wert_max <- lapply(Aufgabe_2c,max)
+wo_max <- lapply(Aufgabe_2c,which.max)
+name_max <- lapply(wo_max,names)
+cbind(name_max, wert_max)
+```
+
+---
+#### (d)
+>Die Dauer des Krankenhausaufenthalts für jeden Patienten ist in der Spalte LOS angegeben. Berechnen Sie den Mittelwert von LOS gruppiert gleichzeitig nach SEX, DIAGNOSIS, DRG und DIED.
+
+```{r echo=TRUE}
+Aufgabe_2d <- with(heartatk4,
+     aggregate(LOS, list(SEX, DIAGNOSIS, DRG, DIED), mean, na.rm = TRUE))
+names(Aufgabe_2d) <- c("SEX","DIAGNOSIS","DRG","DIED","Mittelwert von LOS")
+Aufgabe_2d
+```
+
+---
+
+**Bewertung:** 12/12
+
+---
+
+## Aufgabe 3
+
+#### (a)
+>Im folgenden benötigen Sie den Datensatz birthwt aus dem R-Paket MASS.Laden Sie den genannten Datensatz und rufen Sie die Hilfe zum Datensatz auf.
+
+```{r echo=TRUE}
+data(birthwt, package = "MASS")
+?MASS::birthwt
+```
+
+#### (b)
+>Vergleichen Sie die Mittelwerte vom Geburtsgewicht der Neugeborenen gruppiert nach dem Rauchverhalten ihrer Mutter.
+
+```{r echo=TRUE}
+# Zusatzaufgabe
+birthwt$smoke <- factor(birthwt$smoke, levels = c(0,1), labels = c("Nichtraucher", "Raucher"))
+tapply(birthwt$bwt, birthwt$smoke, mean)
+# Mittelwert vom Geburtsgewicht der Neugeborenen für Nichtraucher ist größer
+```
+
+#### (c)
+>Vergleichen Sie die Mittelwerte vom Geburtsgewicht der Neugeborenen gruppiert nach dem Bluthochdruck (Hypertonie) ihrer Mutter.
+
+```{r echo=TRUE}
+# Zusatzaufgabe
+birthwt$ht <- factor(birthwt$ht, levels = 0:1, labels = c("keine Hypertonie", "Hypertonie"))
+tapply(birthwt$bwt, birthwt$ht, mean)
+# Mittelwert vom Geburtsgewicht der Neugeborenen für "kein Bluthochdruck" ist größer
+```
+
+#### (d)
+>Benutzen Sie die folgenden, neuen Befehle und versuchen Sie diese zu interpretieren. Konsultieren Sie dazu die Hilfe, falls nötig.
+
+```{r echo=TRUE}
+boxplot(birthwt$bwt ~ birthwt$smoke)
+# Box-and-Whisker-Plot von `bwt` (Geburtsgewicht) mit der angegebenen gruppierten Variable `smoke` (smoking status during pregnancy.).
+
+t.test(birthwt$bwt ~ birthwt$smoke)
+# Welch Two Sample t-test für Geburtsgewicht zwischen Nichtrauchern und Rauchern, ob es Unterschied von Geburtsgewicht zwischen Nichtrauchern und Rauchern(H0: kein Unterschied vs. H1 Unterschied) gibt. p-value = 0.007003 ist das Ergeibnis signifikant, dazu wird H0 verworfen, es gibt Unterschied von Geburtsgewicht zwischen Nichtrauchern und Rauchern
+
+boxplot(birthwt$bwt ~ birthwt$ht)
+# Box-and-Whisker-Plot von `bwt` (Geburtsgewicht) mit der angegebenen gruppierten Variable `ht` (history of hypertension).
+
+t.test(birthwt$bwt ~ birthwt$ht)
+# Welch Two Sample t-test für Geburtsgewicht zwischen Probanden mit und ohne Geschichte der Hypertonie, ob es Unterschied von Geburtsgewicht (H0: kein Unterschied vs. H1 Unterschied) gibt. p-value = 0.1332 ist das Ergeibnis nicht signifikant, dazu wird H0 beibehalten, es gibt kein Unterschied von Geburtsgewicht zwischen Probanden mit und ohne Geschichte der Hypertonie.
+```
+
+---
+
+**Bewertung:** 4/4
+
+---
+
+## Zusatzaufgabe
+
+>Nutzen Sie für diese Aufgabe weiterhin den birthwt-Datensatz.
+
+#### (a)
+>Wandeln Sie die Variablen smoke und ht in Faktoren um.
+
+```{r echo=TRUE}
+# birthwt$smoke <- factor(birthwt$smoke, levels = c(0,1), labels = c("Nichtraucher", "Raucher"))
+# birthwt$ht <- factor(birthwt$ht, levels = 0:1, labels = c("keine Hypertonie", "Hypertonie"))
+str(birthwt[c("smoke","ht")])
+```
+
+#### (b)
+>Berechnen Sie die Mittelwerte vom Geburtsgewicht der Neugeborenen gruppiert nach dem Rauchverhalten und Bluthochdruck (Hypertonie) ihrer Mutter, indem Sie für das Argument INDEX die beiden Variablen in einer Liste übergeben.
+
+```{r echo=TRUE}
+with(birthwt,aggregate(bwt, list(smoke,ht), mean, na.rm = TRUE))
+```
+
+```{r echo=TRUE}
+# Alternative
+tapply(birthwt$bwt, list(birthwt$smoke, birthwt$ht), mean)
+```
+
+#### (c)
+>Veranschaulichen Sie das Ergebnis mit dem Befehl: interaction.plot(birthwt$smoke, birthwt$ht, birthwt$bwt).
+
+```{r echo=TRUE}
+interaction.plot(birthwt$smoke, birthwt$ht, birthwt$bwt)
+```
+
+**Interpretation:** Nicht nur für Nichtrauchen sonder auch für Raucher während der Schwangerschaft, ist das Geburtgewicht bei Muttern mit Geschicht der Hypertonie höher als ohne Hypertonie, dazu ist "ht" ein Haupteffekt. 
+
+---
+
+**Ergänzung:** Bei Frauen mit Bluthochdruck scheint Rauchen das Geburtsgewicht sogar zu erhöhen! Es liegen vermutlich Interaktionseffekte vor.
+
+---
+
+#### (d)
+>Eine Alternative zur Veranschaulichung bietet die Funktion bwplot() aus dem Paket lattice an. Diese Funktion mit den Angaben bwplot(y ~ x1 | x2) zeichnet gruppierte Boxplots einer numerischen Variable y gruppiert nach zwei qualitativen Variablen x1 und x2. Veranschaulichen das obige Ergebnis mit Hilfe dieser Funktion.
+
+```{r echo=TRUE}
+library(lattice)
+bwplot(birthwt$bwt ~ birthwt$smoke | birthwt$ht)
+```
+
+---
+
+**Bewertung:** 3/3
+
+**insgesamt:** 19 + 3 Bonuspunkte
+
+---

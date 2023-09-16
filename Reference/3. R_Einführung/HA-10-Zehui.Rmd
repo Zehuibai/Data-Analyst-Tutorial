@@ -1,0 +1,151 @@
+---
+title: "Übungsblatt 10 - Hausaufgaben"
+author: "Zehui Bai,Stefanie Do"
+date: "`r Sys.time()`"
+output: 
+  html_document: 
+    df_print: kable
+    toc: yes
+    toc_depth: 4
+    toc_float: yes
+    code_folding: show
+editor_options:
+  chunk_output_type: console
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE, error = FALSE)
+library(pwr)
+```
+
+
+
+
+
+## Aufgabe 1
+
+Berechnen Sie die benötigte Fallzahl zur Absicherung dieses Eﬀekts.
+
+```{r aufgabe 1a}
+Fallzahl <- pwr.t.test(d = -10/20, power = .9, type = "two.sample", alternative = "less")$n
+ceiling(Fallzahl)
+
+# alternative
+ceiling(power.t.test(delta = 10/20, power = .9, alternative = "one.sided")$n)
+```
+
+die benötigte Fallzahl zur Absicherung dieses Eﬀekts ist 70.
+
+
+
+
+
+Wie groß soll der tatsächliche Effekt (Blut- zuckerwertsenkung) sein?
+
+```{r aufgabe 1b}
+power.t.test(n = 40, delta = NULL, sd = 10, power = .9, alternative = "one.sided")$delta
+
+## pwr.t.test(n = 40, d = NULL,  power = .9, type = "two.sample", alternative = "less")
+```
+
+
+
+
+
+
+
+## Aufgabe 2
+
+```{r aufgabe 2a}
+data(normtemp, package = "UsingR")
+normtemp$gender <- factor(normtemp$gender,labels = c("Mann","Frau"))
+
+
+## Für 2-Stichproben ist F-Test gleich wie T-test
+## t.test(temperature~gender, data=normtemp)
+normtemp.aov <- aov(temperature~gender, data=normtemp)
+summary(normtemp.aov)
+
+library("ggpubr")
+ggboxplot(normtemp, x = "gender", y = "temperature", 
+          color = "gender", palette = c("#00AFBB", "#E7B800"),
+          ylab = "Temperature", xlab = "Geschlecht")
+```
+
+**Interpretation**
+
+P-Wert = 0.0239 kleiner als $\alpha=0.05$, Männer haben die niedrigere Körpertemperatur.
+
+
+
+
+
+```{r aufgabe 2b}
+library(dplyr)
+Diff <- 
+  normtemp %>% 
+  group_by(gender) %>% 
+  summarise(mean = mean(temperature))
+
+Differenz_der_Mittelwerte <- diff(Diff$mean)
+n <- length(normtemp$gender)/2
+
+power.t.test(n = n, delta = Differenz_der_Mittelwerte)$power
+```
+
+die Power des Tests ist 0.3732, um die beobachtete Differenz der Mittelwerte als signifikant erkennen zu können.
+
+
+
+
+
+
+
+```{r aufgabe 2c}
+ceiling(power.t.test(power = 0.8, delta = Differenz_der_Mittelwerte)$n)
+```
+
+die benötigte Fallzahl ist 189 zur Absicherung dieser Differenz, wenn eine Power von mindestens 0.80 erreicht werden soll.
+
+
+
+
+
+
+
+
+## Aufgabe 3
+
+```{r aufgabe 3a}
+data(iris)
+library(multcomp)
+library(broom) 
+
+paarweisen_t_test <- function(var){
+  iris.aov <- aov(var~Species,data = iris)
+  bonferroni <- summary(glht(iris.aov, linfct = mcp(Species = "Tukey")),
+                        test = adjusted(type = "bonferroni"))
+  ## Konfidenzintervall Plot
+  ## plot(confint(bonferroni, level = 0.95))
+  holm <- summary(glht(iris.aov, linfct = mcp(Species = "Tukey")),
+                  test = adjusted(type = "holm"))
+  list <- list(tidy(bonferroni),tidy(holm))
+  return(list)
+}
+
+paarweisen_t_test(var=iris$Sepal.Length)
+```
+
+
+
+
+```{r aufgabe 3b}
+paarweisen_t_test(var=iris$Sepal.Width)
+paarweisen_t_test(var=iris$Petal.Length)
+paarweisen_t_test(var=iris$Petal.Width)
+```
+
+
+
+
+

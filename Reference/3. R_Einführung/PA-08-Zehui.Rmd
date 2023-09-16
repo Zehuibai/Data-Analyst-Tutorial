@@ -1,0 +1,91 @@
+---
+title: "Übungsblatt 8 - Präsenzaufgaben"
+author: "Zehui Bai"
+date: "`r Sys.time()`"
+output: 
+  html_document: 
+    df_print: kable
+    toc: yes
+    toc_depth: 4
+    toc_float: yes
+    code_folding: show
+editor_options:
+  chunk_output_type: console
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE, error = FALSE)
+```
+
+
+```{r}
+# Aufgabe 1
+p <- 1/choose(49,6)
+p
+
+p_2 <- 1-(1-p)^(100*52)
+p_2
+
+p_3 <- 1-(1-p)^(1e6)
+p_3
+
+log(0.5,base=(1-p))
+log(9,base=3)
+
+
+
+# Aufgabe 2
+binom.test(19, 20, 0.9, alternative="greater") # p-value = 0.3917 nicht ablehnen
+## H0: größer als 85 Prozent garantiert ist
+## Power gleich 0...
+## erhöhen Stichprobenumfang?
+qbinom(p=0.95,size=20,prob=0.9)
+1-pbinom(q=20,size=20,prob=0.95)
+
+
+anzahl <- qbinom(p=1-0.05,size=2000,prob=0.9)
+1-pbinom(q=anzahl,size=2000,prob=0.94)
+1-pbinom(q=anzahl,size=2000,prob=0.91)
+1-pbinom(q=anzahl,size=2000,prob=0.80)
+
+
+
+# Aufgabe 3.1
+k <- qbinom(p=1-0.05,size=30,prob=0.7)
+1-pbinom(q=k,size=30,prob=0.8)
+# power 0.2552333
+
+
+
+# Aufgabe 3.2
+x <- 0
+p <- 0
+repeat{
+  x <- x+0.000001  
+  p <- 1-pbinom(q=k,size=30,prob=x)
+  if(p >= 0.95) {
+    break } 
+  }
+x
+
+
+
+
+# Aufgabe 3.3
+n <- 1
+repeat{
+  n <- n+1  
+  k <- qbinom(p=1-0.05,size=n,prob=0.7)
+  p <- 1-pbinom(q=k,size=n,prob=0.71)
+  if(p >= 0.9) {
+    break } 
+  }
+n
+
+
+
+
+
+
+
+```

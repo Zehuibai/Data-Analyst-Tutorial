@@ -1,0 +1,219 @@
+---
+title: 'R-Kurs: 2. Sitzung'
+author: "Zehui Bai, Stefanie do"
+date: "10/25/2019"
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+---
+
+
+ 
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 1. Hausaufgabe 1 (2 Punkte)
+   Erzeugen Sie der folgenden Vektor:
+   $\underbrace{"T" \quad "C" }_{100 \, mal}$  
+```{r labelAufgabe1a}
+
+c(rep(c("T","C"),times=100))
+# c() redundant, besser:
+rep(c("T","C"),times=100) 
+
+```
+   Erzeugen Sie der folgenden Vektor:
+   $\underbrace{"T"}_{100 \, mal}\underbrace{"C"}_{50 \, mal}$   
+    
+```{r labelAufgabe1b}
+
+c(rep("T",100),rep("C",50))# ist richtig. alternativ:
+rep(c("T","C"),times=c(100,50))
+
+```
+
+-------------- ------------------------------------
+**Bewertung:** Richtig gemacht;
+
+               2/2
+
+-----------------------------------------------
+
+## 2. Hausaufgabe 2 (4 Punkte)
+   
+```{r labelAufgabe2}
+
+# Matrix X
+X <-matrix( c(31,22,19,21,41,64,12,30,52),nrow=3, ncol=3, byrow=F)
+X
+
+# det(X)
+det(X)
+
+#  X−1
+solve(X)
+
+# x^{T}x^{-1}
+t(X) %*% solve(X)
+
+# XX^{-1}
+X %*% solve(X)
+# Das Ergebnis ist nicht wie so zu erwarten, es soll Matrix diag(3) sein.
+
+```
+
+-------------- ------------------------------------
+**Bewertung:** Richtig gemacht; allerdings würde ich sagen: das Ergebnis ist bis auf die Rundungsfehler zu erwarten
+
+               4/4
+
+-----------------------------------------------
+
+## 3. Hausaufgabe 3 (7 × 2 P)
+Mit dem Befehl x<-rnorm(1000,mean=170,sd=10) generiert man 1000 Daten aus einer Normalverteilung mit den Parametern $μ$ = 170 und $σ$ = 10.
+
+a) Berechnen Sie den Mittelwert und die Standardabweichung von $x$ und schreiben Sie das Ergebnis in den Kommentar. Wie groß ist die relative/absolute Abweichung der berechneten Werte von $μ$ und $σ$.
+
+```{r labelAufgabe3a}
+
+x<-rnorm(1000,mean=170,sd=10)
+absolute_Abweichung_μ <- mean(x)-170
+absolute_Abweichung_μ
+
+relative_Abweichung_μ <- mean(x)/170
+relative_Abweichung_μ
+
+absolute_Abweichung_σ <- sd(x)-10
+absolute_Abweichung_σ
+
+relative_Abweichung_σ <- sd(x)/10
+relative_Abweichung_σ
+
+```
+
+---
+
+**Korrektur:**
+```{r labelAufgabe3aKorr}
+relative_Abweichung_μ <- (mean(x)-170)/170
+
+relative_Abweichung_σ <- (sd(x)-10)/10
+
+```
+
+In a) 1.5/2
+
+---
+
+b) Speichern Sie die ersten 500 Werte von $x$ im Vektor $y$ und die letzten 500 Werte von $x$ in $z$. Hinweis: head() bzw. tail() mit dem Parameter $n$ benutzen.
+
+```{r labelAufgabe3b}
+
+y <- head(x,500)
+z <- tail(x,500)
+
+```
+
+c) Speichern Sie die Einträge von $x$, welche die Bedingungen 150 ≤ x ≤ 190 erfüllen, in $w$.
+
+```{r labelAufgabe3c}
+
+w <- x[which(x <= 190 & x >= 150)]
+
+```
+
+d) Generieren Sie 1000 Daten aus einer Normalverteilung mit den Parametern $μ$ = 180 und $σ$ = 10 und speichern Sie diese Daten in dem Vektor $x1$.
+
+```{r labelAufgabe3d}
+
+x1 <- rnorm(1000,mean=180,sd=10)
+
+```
+
+e) Fassen Sie die Daten $x$ und $x1$ mithilfe von $cbind()$ in 2 Spalten einer Matrix $M$ zusammen.
+
+```{r labelAufgabe3e}
+
+M <- cbind(x,x1)
+
+```
+
+f) Jede Zeile der Matrix $M$ soll die Größen eines Paares definieren. Bestimmen Sie bei wie vielen Paaren beide Partner größer als 190 cm sind. 
+
+```{r labelAufgabe3f}
+
+length( M[which((x>190)&(x1>190))] )
+
+# Alternative
+sum((x>190)&(x1>190))
+
+```
+
+---
+
+**Achtung:** Es kommt das richtige Ergebnis heraus, dennoch sehe ich `M[...]` im obigen Befehl als logischen Fehler. Überlege, was `M[which((x>190) & (x1>190))]` für ein Vektor ist! Besser so:
+```{r, results="hide"}
+length(which((x>190) & (x1>190)))
+```
+
+Die Alternative ist richtig. Gleiches gilt für g)
+
+---
+
+g) Bei wie vielen Paaren ist mindestens ein Partner kleiner als 150 cm?
+
+```{r labelAufgabe3g}
+
+length( M[which((x<150)|(x1<150))] )
+
+# Alternative
+sum((x<150)|(x1<150))
+
+```
+
+---
+
+-------------- ------------------------------------
+**Bewertung:** 12.5/14
+
+-----------------------------------------------
+
+---
+
+## 3. Zusatzaufgabe (3 P)
+entsprechen die von Ihnen berechnete Werte in f) und g) den erwarteten Werten, die man aus der Wahrscheinlichkeitsrechnung kennt? Begründen Sie Ihre Antwort!
+
+```{r Zusatzaufgabe}
+
+# denn x und x1 sind unabhängig voneinander
+P_erwartet_f <- (1-pnorm(190, 170, 10))*(1-pnorm(190, 180, 10))
+P_erwartet_f
+p_berechnet_f <- sum((x>190)&(x1>190))/1000
+p_berechnet_f
+
+P_erwartet_g <- pnorm(150, 170, 10)+pnorm(150, 180, 10)-pnorm(150, 170, 10)*pnorm(150, 180, 10)
+P_erwartet_g
+p_berechnet_g <- sum((x<150)|(x1<150))/1000
+p_berechnet_g
+
+# dazu entsprechen die von mir berechnete Werte in f) und g) nicht den erwarteten Werten, denn nach Gesetze der großen Zahlen wird die relative Häufigkeit eines Zufallsergebnisses in der Regel um die theoretische Wahrscheinlichkeit eines Zufallsergebnisses stabilisiert, wenn das zu Grunde liegende Zufallsexperiment immer wieder unter denselben Voraussetzungen durchgeführt wird.
+```
+
+---
+
+**Ergänzung:** Anzahl erwarteter Paare fehlt
+```{r ZusatzaufgabeExtra}
+
+P_erwartet_f*1000
+
+P_erwartet_g*1000
+```
+
+-------------- ------------------------------------
+**Bewertung:** 2/3
+**insgesamt:** 18.5/20 + 2 BP
+
+-----------------------------------------------

@@ -1,0 +1,147 @@
+---
+title: "Aufgabe 4"
+subject: "R Einführung"
+author: "Zehui Bai"
+date: "`r Sys.time()`"
+fontsize: 10pt
+colorlinks: yes
+boldstyle: TeX
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    df_print: paged
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(readr)
+library(dplyr)
+```
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+## Präsenzaufgabe 1
+
+In Hausaufgabe 1e) von Blatt 3 haben wir die Anwendung der Befehle unique(x), duplicated(x), x[!duplicated(x)] auf einen Vektor x gesehen. Jetzt wollen wir die gleichen Fragen beantwor- ten für den Fall, dass x ein Datensatz ist. Laden Sie den Datensatz airquality aus dem Paket datasets.
+
+a) Interpretieren Sie den Befehl
+```{r echo=TRUE}
+airquality <- data.frame(airquality)
+AirDouble <- rbind(airquality, airquality[sample(1:nrow(airquality), 10),])
+AirDouble
+```
+
+**Interpretation**: Hängt 10 zufällig ausgewählte Zeilen aus `airquality` and `airquality` und speichert in `AirDouble`.
+
+b) Welche Subgruppen bildet man mit
+
+```{r echo=TRUE}
+unique(AirDouble); AirDouble[!duplicated(AirDouble),]
+```
+Nur unique bzw. non-duplicated rows of `airquality`.
+
+c) Welche Subgruppen bildet man mit
+```{r echo=TRUE}
+airquality[!duplicated(airquality[,5]),]
+airquality[!duplicated(airquality[,6]),]
+# Keine duplicates Iterm in der 5./6. Spalte.
+```
+
+## Präsenzaufgabe 2
+
+Der Datensatz gewicht.txt (Datei im StudIP verfügbar) enthält das Geburtsgewicht eines Neuge- borenen (bwt), das Rauchverhalten der Mutter (smoke, 0=ˆ Nichtraucher, 1=ˆ Raucher, 9=ˆ fehlender Wert) und die Identifikationsnummer der Mutter (PatID). Laden Sie diesen Datensatz in R und bearbeiten Sie die folgenden Aufgaben:
+
+a) Ersetzen Sie in der Spalte smoke Werte, die gleich 9 sind, durch NA.
+```{r echo=TRUE}
+gewicht <- read.csv(file="~/Documents/R_Kurs/gewicht.txt", sep = "",
+                      header=T)
+table(gewicht$smoke,useNA="always")
+gewicht$smoke[which(gewicht$smoke == 9)]=NA
+table(gewicht$smoke,useNA="always")
+```
+
+b) Berechnen Sie Minimum, Maximum, Mittelwert, Standardabweichung und Median des Geburtsgewichts gruppiert nach dem Rauchverhalten der Mutter.
+```{r echo=TRUE}
+gewicht %>%
+  mutate(smoke = if_else(smoke == 0, "Nichtraucherin", "Raucherin")) %>%
+  group_by(smoke) %>%
+  summarize(n = n(),
+            min = min(bwt),
+            max = max(bwt),
+            mean = mean(bwt),
+            sd = sd(bwt),
+            median = median(bwt))
+
+# Alternative
+FUN = function(x) c(n=length(x),min=min(x),max=max(x), mean = mean(x),std=sd(x),median=median(x))
+aggregate(gewicht$bwt,list(gewicht$smoke), FUN)
+```
+
+c) Der Datensatz enthält auch die Daten von Müttern mit mehreren Kindern. Gehen Sie davon aus, dass die Daten nach dem Datum geordnet sind. Bilden Sie eine Untergruppe first_value, die angibt, ob es sich um Daten für die jeweils erste Geburt der Mütter handelt.
+
+```{r echo=TRUE}
+first_value <- gewicht[!duplicated(gewicht$PatID), ]
+
+gewicht$first_value <- FALSE
+gewicht[!duplicated(gewicht$PatID), "first_value"] <- TRUE
+```
+
+d) Bilden Sie eine Untergruppe last_value, die angibt, ob es sich um Daten für die jeweils letzte Geburt der Mütter handelt.
+
+```{r echo=TRUE}
+last_value <- gewicht[!duplicated(gewicht$PatID, fromLast = TRUE), ]
+# Alternative
+last_value <- gewicht[!duplicated(rev(gewicht$PatID)),  ]
+
+gewicht$last_value <- FALSE
+gewicht[!duplicated(gewicht$PatID), "last_value"] <- TRUE
+```
+
+e) Bilden Sie eine Untergruppe non_repeated, welche die Daten der Mütter danach gruppiert, ob sie nur ein Kind geboren haben.
+
+```{r echo=TRUE}
+gewicht[gewicht$first_value & gewicht$last_value, ] %>%nrow()
+non_repeated <- gewicht[gewicht$first_value & gewicht$last_value, ]
+```
+
+f) Bearbeiten Sie die Teilaufgabe b) auch für die in c) bis e) erstellten Subgruppen.
+
+```{r echo=TRUE}
+Berechnen_c <- aggregate(first_value$bwt,list(first_value$smoke), FUN);Berechnen_c
+Berechnen_d <- aggregate(last_value$bwt,list(last_value$smoke), FUN);Berechnen_d
+Berechnen_e <- aggregate(non_repeated$bwt,list(non_repeated$smoke), FUN);Berechnen_e
+```
+
+## Präsenzaufgabe 3
+Speichern Sie den Datensatz bilirubin.txt (Datei im StudIP verfügbar) auf Ihrem Rechner und laden Sie ihn in R.
+a. Berechnen Sie Minimum, Maximum, Mittelwert, Standardabweichung und Median vom Bilirubin-Wert und vom Alter der Patienten jeweils gruppiert nach dem Geschlecht.
+
+```{r echo=TRUE}
+bilirubin <- read_delim("~/Documents/R_Kurs/bilirubin.txt", delim = ";")
+aggregate(bilirubin[c("Wert", "ALTER")], list(bilirubin$SEX), FUN)
+```
+
+b. Wieviele Patienten sind mindestens 70 Jahre alt?
+
+```{r echo=TRUE}
+length(bilirubin$ALTER[bilirubin$ALTER >= 70])
+# Alternative
+bilirubin[bilirubin$ALTER >= 70,] %>% nrow()
+```
+
+c. Wieviele Frauen in diesem Datensatz sind jünger als 30 Jahre und haben Bilirubin-Werte kleiner als 1.1?
+
+```{r echo=TRUE}
+nrow(bilirubin[bilirubin$SEX == "W" & bilirubin$Wert < 1.1, ])
+```
+
+d. Wieviel Prozent der unter 30-jährigen Männer bzw. Frauen haben Bilirubin-Werte zwischen 0.4 und 1.2 ([0.4, 1.2])?
+
+```{r echo=TRUE}
+
+```

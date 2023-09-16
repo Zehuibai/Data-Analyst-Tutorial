@@ -1,0 +1,182 @@
+---
+title: "Aufgabe 6"
+subject: "R Einführung"
+author: "Zehui Bai,Stefanie Do"
+date: "`r Sys.time()`"
+output: 
+  html_document: 
+    df_print: kable
+    toc: yes
+    toc_depth: 4
+    toc_float: yes
+    code_folding: show
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE, error = FALSE)
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+library(readr)
+library(car)
+```
+
+
+
+# Aufgabe 1
+
+Importieren Sie den Datensatz gewicht.txt (aus StudIP).
+
+## (a)
+
+Veranschaulichen Sie die Verteilung des Geburtsgewichts durch ein Histogramm und einen Boxplot.
+
+```{r aufgabe1a}
+gewicht <- read.table(file="gewicht.txt", head=TRUE, sep="")
+#gewicht <- read.table(file="~/Desktop/SASUniversityEdition/myfolders/Daten/gewicht.txt", head=TRUE, sep="")
+
+ggplot(data = gewicht, aes(x = bwt)) +
+  geom_histogram(bins = 30)
+
+ggplot(data = gewicht, aes(x = NA, y = bwt)) +
+  geom_boxplot()
+```
+
+## (b)
+
+Veranschaulichen Sie die Verteilung des Gewichts gruppiert nach dem Rauchverhalten der Mutter mittels gruppierter Boxplots.
+
+```{r aufgabe1b}
+gewicht$smoke <- factor(gewicht$smoke,labels = c("Nichtraucher","Raucher","Missing"))
+ggplot(data = gewicht, aes(x = smoke, y = bwt,fill=smoke)) +
+  geom_boxplot()
+```
+
+---
+
+**Kommentar:** ist so ok. Ich finde die Beschriftung "NA" im Boxplot aber ungünstig. Vielleicht besser sowas:
+```{r}
+ggplot(data = gewicht, aes(x = "smokers&non-smokers", y = bwt)) + geom_boxplot()
+```
+
+**Bewertung:** 4 Punkte
+
+---
+
+# Aufgabe 2
+
+Installieren Sie das R-Package DAAG. Der Datensatz cuckoos in diesem Paket enthält die Länge und Bereite gelegter Eier von verschiedenen Kuckucksvögeln.
+
+## (a) 
+
+Berechnen Sie Mittelwert und Standardabweichung der Variablen length und breadth für jede Vogelart aus dem Datensatz.
+
+```{r aufgabe2a}
+data("cuckoos", package = "DAAG")
+
+var <- list(quo(mean(length)), quo(sd(length)),quo(mean(breadth)), quo(sd(breadth)))
+cuckoos %>%
+  group_by(species) %>%
+  summarise(!!! var)
+```
+
+## (b)
+
+Veranschaulichen Sie durch gruppierte Boxplots die Verteilung von length und breadth für die verschiedenen Vogelarten. Welche Vogelart legt das kleinste Ei? Entspricht dies Ihrer Erwartung im Hinblick auf die Ergebnisse aus a.?
+
+```{r aufgabe2b}
+par(mar=c(3,3,2,2))
+boxplot(cuckoos$length~cuckoos$species, outline=FALSE, col="gray90")
+boxplot(cuckoos$breadth~cuckoos$species, outline=FALSE, col="gray90")
+
+## mit ggplot
+ggplot(cuckoos, aes(x=species, y=cuckoos[,1], fill=species)) + geom_boxplot()
+ggplot(cuckoos, aes(x=species, y=cuckoos[,2], fill=species)) + geom_boxplot()
+```
+
+**Interpretation:**  Das kleinste Ei ist sowohl für die Länge als auch für die Breite bei der Vogelspezies Wren zu erwarten.
+
+Diese Ergebnisse stimmen mit denen aus Aufgabe 2a) überein, in denen die Vogelspezies Wren relativ kleine Mittelwerte für die Länge und Breite ausfweisen.
+
+---
+
+**Empfehlung:** Ich würde den Boxplot beschriften, z.B: mit `+ ylab("egg length")`
+
+---
+
+## (c)
+
+Zusatzaufgabe: Wir wollen den Unterschied der Größen der Vogeleier auf Signifikanz testen. Dies soll einmal mit Hilfe der Varianzanlyse und einmal mit dem pairwise t-test geschehen. Interpretieren Sie die Ergebnisse.
+
+
+```{r aufgabe2c}
+# ANOVA
+cuckoos.aov <- aov(length ~ species, data = cuckoos)
+summary(cuckoos.aov)
+
+# Pairwise t-test ohne Adjustierung
+pairwise.t.test(cuckoos$length, cuckoos$species, p.adjust.method = "none") %>% 
+  broom::tidy() %>% 
+  filter(p.value < 0.05)
+# Pairwise t-test mit bonferroni Adjustierung
+pairwise.t.test(cuckoos$length, cuckoos$species, p.adjust.method = "bonferroni") %>% 
+  broom::tidy() %>% 
+  filter(p.value < 0.05)
+# Pairwise Verleichen mit Tukey-Methode
+library(multcomp)
+cuckoos.mc <- glht(cuckoos.aov, 
+                   linfct = mcp(species = "Tukey"))
+summary(cuckoos.mc)
+```
+
+**Interpretation**:
+
+Für ANOVA ist das Ergebnis signifikant,d.h. wird Nullhypothese "Es gibt keinen Unterschied der Größen der Vogeleier" verworfen. Wenn wir wissen wollen, welche Vogeleiergröße miteinander unterschiedlich ist, können wir einen paarweisen Test durchführen. 
+
+* pairwise.t.test() m wurden getrennte t-Tests ohne Berücksichtigung der Multiplizität durchgeführt.
+* bonferroni Methode ist sehr konservativ und dazu gibt es weniger signifikante Ergebnisse.
+* Tukey Methode berücksichtigt die Korrelation und werden alle Paarweise Vergleichen durchgefürht. 
+
+---
+
+**Bewertung:** 11 Punkte
+
+---
+
+# Aufgabe 3
+
+Die Funktion scatterplot enthalten im Paket car ist eine erweiterte Funktion für Streudiagramme. Mittels scatterplot(y ~ x | z , ...) kann man ein Streudiagramm für die Punkte (x, y) gruppiert nach z erstellen. Zusätzlich wird dabei eine glatte Funktion durch die Punktwolken gelegt, die mittels dem sogenannten LOESS-Verfahren (locally weighted polynomial regression) bestimmt wurde.
+
+## (a)
+
+Erstellen Sie mit der Funktion scatterplot ein nach der Variable Species gruppiertes Streudiagramm für die Merkmale Sepal.Length, Sepal.Width aus dem iris-Datensatz. Verwenden Sie die Option reg.line=F.
+
+```{r aufgabe3a}
+data(iris)
+par(mar=c(3,3,2,2))
+scatterplot(Sepal.Width ~ Sepal.Length | Species, data = iris, regLine = FALSE)
+```
+
+## (b)
+
+Die Funktion smooth.spline(x,y) (aus dem Paket stats) schätzt eine andere glatte Funktion, einen sogenannten smooth spline zu den Punktwolken (x, y).
+Erstellen Sie zunächst mit der Funktion scatterplot ein (diesmal nicht gruppiertes) Streudiagramm für Sepal.Length und Sepal.Width. Schätzen Sie dann dazu passend einen smooth spline für die Merkmale Sepal.Length und Sepal.Width und speichern Sie das Ergebnis in einer Variablen smspline. Fügen Sie die geschätze Kurve (also den Smooth Spline) dann dem Bild hinzu (Hinweis: lines() auf den Smooth Spline anwenden.).
+
+
+```{r aufgabe3b}
+smspline <- smooth.spline(iris$Sepal.Length, iris$Sepal.Width)
+scatterplot(iris$Sepal.Length, iris$Sepal.Width, regLine = FALSE)
+lines(smspline)
+```
+
+---
+
+**Bewertung:**  8 Punkte
+
+**Gesamtbewertung:** alle 23 Punkte
+
+---
+
+

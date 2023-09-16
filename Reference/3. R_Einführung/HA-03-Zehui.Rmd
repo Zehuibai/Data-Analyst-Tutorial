@@ -1,0 +1,169 @@
+---
+title: "Aufgabe 3"
+subject: "R Einführung"
+author: "Zehui Bai"
+date: "`r Sys.time()`"
+fontsize: 10pt
+colorlinks: yes
+boldstyle: TeX
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    df_print: paged
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Hausaufgabe 1 (9 Punkte)
+
+Die Größe einer Grundgesamtheit (in cm) sei normalverteilt mit den Parametern $μ$ = 170 und $σ$ = 10 . Verschaffen Sie sich eine Stichprobe vom Umfang n = 2000 aus dieser Population mittels folgendem Befehl:
+
+```{r Hausaufgabe1}
+pop1 <- rnorm(2000, 170, 10)
+```
+
+a.	Runden Sie die Größe auf ganze Zahlen mithilfe des Befehls round() (d.h. pop1 mit den gerundeten Werten überschreiben!).
+```{r Hausaufgabe1a}
+a <- round(pop1)
+```
+
+b.	Führen Sie den Befehl which(pop1 > 190) aus und interpretieren Sie das Ergebnis.
+```{r Hausaufgabe1b}
+which(pop1 > 190)
+# Interpretation: Befehl rnorm(2000, 170, 10) erzeugt 2000 in der Stichprobe, Ergebnisse von which(pop1 > 190) sind Nr. der Anzahl größer als 190.
+```
+
+c.	Welche Subgruppe wird durch pop1[pop1 > 190] erzeugt?
+```{r Hausaufgabe1c}
+pop3 <- pop1[pop1 > 190]
+# pop3 enthält Elemente aus pop1, die größer als 190.
+```
+
+d.	Bilden Sie 2 Subgruppen: 1) Größe < 155 und 2) Größe > 185.
+```{r Hausaufgabe1d}
+pop4 <- pop1[pop1 < 155]
+pop5 <- pop1[pop1 > 185]
+```
+
+e.  Interpretieren Sie die Ergebnisse:
+```{r Hausaufgabe1e}
+e1 <- rev(pop1)                # Umgekehrte Reihenfolge von Vektor pop1 
+e2 <- unique(pop1)             # unique gibt eine Vektor zurück, bei der doppelte Elemente entfernt wurden
+e3 <- duplicated(pop1)         # duplicated gibt einen logischen Vektor(True & False) zurück, der angibt, welche Elemente gleich sind(True)
+e4 <- pop1[duplicated(pop1)]   # Vektor von Elementen aus pop1, die wiederholt haben (True)
+e5 <- pop1[!duplicated(pop1)]  # Vektor von Elementen aus pop1, die nicht wiederholt haben (False, wie unique(pop1) )
+```
+
+f.	Simulieren Sie eine weitere Stichprobe pop2 vom Umfang n = 1000 aus einer Grundge-samtheit, deren Größe N($μ$ = 172 und $σ$ = 12)-verteilt ist.
+```{r Hausaufgabe1f}
+pop2 <- rnorm(1000, 172, 12)
+```
+
+g.	Runden Sie die Größe in der 2. Stichprobe auf ganze Zahlen.
+```{r Hausaufgabe1g}
+g <- round(pop2) 
+```
+
+h.	Ordnen Sie 1000 Individuen aus der 1. Stichproben der Zweiten zufällig zu. Deﬁnieren Sie dazu eine Matrix $X$ mit zwei Spalten, deren 1. bzw. 2. Spalte die Individuen der 1. bzw. 2.	Stichproben beinhaltet.
+```{r Hausaufgabe1h}
+M <- cbind(sample(pop1,1000, replace=FALSE),pop2)
+colnames(M) <- c ("1. Stichproben","2. Stichproben")
+head(M,20)
+```
+
+i.	Wir betrachten jede Zeile dieser Matrix als ein Paar, wobei wir die Individuen der 1. bzw.2.	Stichproben als Mann bzw. Frau bezeichnen. Bei wie vielen Paaren ist der Mann kleiner als die Frau?
+```{r Hausaufgabe1i}
+colnames(M) <- c ("Mann","Frau")
+Compare <- M[,"Mann"]-M[,"Frau"]
+length(Compare[which(Compare<0)])
+```
+
+Zusatzaufgabe (1 P): entspricht der von Ihnen berechneten Wert in i) dem erwarteten Wert, den man aus der Wahrscheinlichkeitsrechnung kennt? Begründen Sie Ihre Antwort!
+```{r Hausaufgabe1zusatz}
+# "Mann"~N(170,10^2); "Frau"~N(172,12^2), "Mann" und "Frau" sind stochastisch unabhängig
+# "X"= "Mann"-"Frau" ~ N(170-172,10^2+12^2) ~N(-2,244)
+# Erwartete Wahrscheinlichkeit = P(X<0) = 
+P_erwartet <- pnorm(0, -2, sqrt(244)); P_erwartet
+# berechnete Wahrscheinlichkeit =
+P_berechnet <- length(Compare[which(Compare<0)])/1000;P_berechnet
+identical(P_berechnet,P_erwartet)
+# Dazu entspricht der von mir berechneten Wert in i) nicht dem erwarteten Wert. Denn laut der Gesetze der großen Zahlen wird die relative Häufigkeit eines Zufallsergebnisses in der Regel um die theoretische Wahrscheinlichkeit eines Zufallsergebnisses stabilisiert, wenn das zu Grunde liegende Zufallsexperiment immer wieder unter denselben Voraussetzungen durchgeführt wird.
+```
+
+## Hausaufgabe 2 (6 (+2) Punkte)
+
+a.	Deﬁnieren Sie eine Funktion, die angibt, ob es in einer Spalte eines Datensatzes NA-Werte gibt. (Datensatz wird als Argument der Funktion übergeben!)
+
+```{r Hausaufgabe2a}
+Na_Spalten <- function(x){
+    a <-ifelse(colSums(is.na(x)) > 0,"Ja","Nein")
+    return(list(Ob_es_fehlenden_Wert_in_Splaten=a))
+}
+```
+
+b.	Deﬁnieren Sie eine Funktion, die angibt, ob es in einer Zeile eines Datensatzes NA-Werte gibt.
+```{r Hausaufgabe2b}
+Na_Zeilen <- function(x){
+    a <-ifelse(rowSums(is.na(x)) > 0,"Ja","Nein")
+    return(list(Ob_es_fehlenden_Wert_in_Zeilen=a))
+}
+```
+
+c.	Wenden Sie diese Funktionen an den Spalten bzw. Zeilen des airquality-Datensatzes an.
+```{r Hausaufgabe2c}
+airquality <- data.frame(airquality)
+Na_Spalten(airquality)
+Na_Zeilen(airquality)
+```
+
+d.	Zusatzaufgabe: Deﬁnieren Sie eine Funktion, die für einen Datensatz angibt, in welchen Spalten es NA-Werte gibt.
+```{r Hausaufgabe2d}
+Welche_Na_Zeilen <- function(x){
+    list <-which(colSums(is.na(x)) > 0) 
+    Splten_NA <- x[list,]
+    return(Splten_NA)
+}
+```
+
+e. Zusatzaufgabe: Das Gleiche wie in d., aber dieses Mal soll die Funktion angeben, in welchen Zeilen es NA-Werte gibt.
+```{r Hausaufgabe2e}
+Welche_Na_Zeilen <- function(x){
+    list <-which(rowSums(is.na(x)) > 0) 
+    Zeilen_NA <- x[list,]
+    return(Zeilen_NA)
+}
+```
+
+## Hausaufgabe 3 (2+3 Punkte)
+
+Die Variable $Wind$ im Datensatz $airquality$ gibt die Windsgeschwindigkeit in mph (mile per hour) an. Dies ist eine metrisch-skalierte Variable.
+
+a.	Bilden Sie aus dieser Variable eine neue, ordinal-skalierte Variable $wind$, wie folgt:
+wind="*schwach*", falls Wind $\leq$ 12,
+wind="*stark*", sonst
+und fügen Sie diese Variable dem Datensatz airquality hinzu.
+
+```{r Hausaufgabe3a}
+airquality <- data.frame(airquality)
+airquality$wind <- ifelse(airquality$Wind<=12,"schwach" ,"stark")
+airquality$wind <- as.factor(airquality$wind)
+levels(airquality$wind)
+head(airquality$wind)
+```
+
+b.  Deﬁnieren Sie jetzt das ordinal-skalierte Merkmal wind als:
+wind="*schwach*", falls Wind <= 4,
+wind="*mild*", falls 4 < Wind<= 18
+wind="*stark*", sonst.
+
+```{r Hausaufgabe3b}
+airquality <- data.frame(airquality)
+airquality$wind <- ifelse(airquality$Wind<=4, "schwach", ifelse(airquality$Wind<=18, "mild" ,"stark"))
+airquality$wind <- as.factor(airquality$wind)
+levels(airquality$wind)
+```

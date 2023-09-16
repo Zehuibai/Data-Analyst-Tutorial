@@ -1,0 +1,128 @@
+---
+title: "Übungsblatt 7 - Präsenzaufgaben"
+author: "Zehui Bai"
+date: "`r Sys.time()`"
+output: 
+  html_document: 
+    df_print: kable
+    toc: yes
+    toc_depth: 4
+    toc_float: yes
+    code_folding: show
+editor_options:
+  chunk_output_type: console
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE, error = FALSE)
+```
+
+
+```{r aufgabe 1}
+curve(dnorm(x), from=-4, to=4, col="black", lty=1, lwd=2, ylab="")
+curve(dt(x, 3), from=-4, to=4, col="gray", lty=1, lwd=2,add=TRUE)
+curve(dt(x, 5), from=-4, to=4, col="red", lty=2, lwd=2, add=TRUE)
+curve(dt(x, 10), from=-4, to=4, col="blue", lty=2, lwd=2, add=TRUE)
+curve(dt(x, 30), from=-4, to=4, col="green3", lty=2, lwd=2, add=TRUE)
+curve(dt(x, 50), from=-4, to=4, col="yellow", lty=2, lwd=2, add=TRUE)
+legend(0, 0.3,
+       legend=c(expression(dnorm(x)),expression(dt(x, 3)), expression(dt(x, 5)),
+                expression(dt(x, 10)), expression(dt(x, 30)),expression(dt(x,50))),
+       col = c("black","gray","red","blue","green3","yellow"), lty =1:6)
+
+
+
+
+
+
+library(tibble)
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+library(forcats)
+
+dichten <- tibble(
+  x = seq(-4, 4, .1),
+  `t(3)` = dt(x, 3),
+  `t(5)` = dt(x, 5),
+  `t(10)` = dt(x, 10),
+  `t(30)` = dt(x, 30),
+  `t(50)` = dt(x, 50),
+  `N(0,1)` = dnorm(x)
+)
+
+dichten %>% 
+  gather(dist, prob, -x) %>%
+  mutate(dist = fct_inorder(dist),
+         family = if_else(grepl("t", dist), "t", "NV")) %>%
+  ggplot(aes(x = x, y = prob, linetype = family, color = dist)) +
+  geom_line(size = 1.25) +
+  scale_color_brewer(palette = "Blues") +
+  theme_minimal() +
+  theme(legend.position = "top")
+```
+
+
+```{r  aufgabe 2}
+gaussian <- function(p,u1,u2,sigma1,sigma2,n){
+ k=rbinom(1,n,p);
+ f1=rnorm(k,u1,sigma1);
+ f2=rnorm(n-k,u2,sigma2);
+ f=p*f1+(1-p)*f2;
+ f
+}
+```
+
+
+
+```{r aufgabe 4}
+f <- function(x) {exp(x^2)}
+(1 - -1) * mean(f(runif(1e6, min = -1, max = 1)))
+integrate <- integrate(f, -1, 1)
+
+
+
+library(dplyr)
+library(purrr)
+library(ggplot2)
+
+f <- function(x) {exp(x^2)}
+
+sim_f <- function(n) {
+  (1 - -1) * mean(f(runif(n, min = -1, max = 1)))
+}
+
+map_df(1:1000, function(n) {
+  tibble(
+    n = n,
+    sim = sim_f(n)
+  )
+}) -> sims
+
+ggplot(data = sims, aes(x = n, y = sim)) +
+  geom_point() +
+  geom_hline(yintercept = integrate(f, -1, 1)$value, 
+             color = "red")
+
+
+f <- function(x) {log(1 + tan(x)^2)}
+(pi/8) * mean(f(runif(1e6, 0, pi/8)))
+
+f <- function(x) {sin(2*x) * cos(x)}
+pi * mean(f(runif(1e6, -pi/2, pi/2)))
+
+```
+
+
+
+```{r aufgabe 5}
+pi_func <- function(B) {
+  x_B <- runif(B, -1, 1)
+  y_B <- runif(B, -1, 1)
+  kreis <- sum(sqrt(x_B^2 + y_B^2) <= 1)
+  (kreis/B) * 4
+}
+pi_func(1e6)
+```
+
+

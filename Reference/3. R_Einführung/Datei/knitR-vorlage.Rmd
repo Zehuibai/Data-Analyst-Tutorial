@@ -1,0 +1,78 @@
+---
+title: 'R-Kurs: 2. Sitzung'
+author: "Mein Name"
+date: "21. Oktober 2019"
+output:
+  html_document: default
+  word_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 1. Hausaufgabe 1 (2 Punkte)
+   Erzeugen Sie die folgenden Vektoren:
+```{r labelAufgabe1}
+# Hier kann Programmcode zu Aufgabe 1a) stehen
+
+my_mean <- function( ) {
+  # Inhalt der Funktion
+}
+
+```
+  *Hinweis:* benutzen Sie die Funktionen: `sum()` und `length()`.
+
+  b) Schreiben Sie **Ihre eigene** Funktion `my_range()` um das Intervall (range) eines Vektors zu berechnen.
+```{r}
+
+# mein Code zu Aufgabe 1b)
+
+```
+
+## 2. Präsensaufgabe
+
+a)  Speichern Sie alle natürlichen Zahlen von 1 bis 50 in der Variablen `x` und eine Folge von 1 bis 10 mit der Schrittweite 0.2 in der Variablen `y` ab. Berechnen Sie $\sqrt[3]{x}$ und $\log(y)$.
+Multiplizieren Sie `x` und `y` aus und kommentieren Sie das Ergebnis.
+b)  Erzeugen Sie die folgenden Vektoren mit R:  
+ $\underbrace{1 \quad 2 \quad  3}_{40 \, mal}$  
+ $1 \quad 1 \quad 2\quad 2 \quad 2 \quad  ... \quad \underbrace{100 ... \quad 100}_{101 \, mal}$  
+ $\underbrace{1 \quad 1 \quad 2\quad 2 \quad 2 \quad  ... \quad \underbrace{100 ... \quad 100}_{101 \, mal}}_{4 \, mal}$  
+ *Hinweis:* Für das zweite Beispiel kann man `rep()` mit dem Parameter `times` benutzen.
+c) Erzeugen Sie eine Matrix `M` mit 20 Spalten und den folgenden
+  Zeileneinträgen:
+ ```
+  Zeile 1: Zahlen zwischen 0.5 und 10 mit Abstand 0.5
+  Zeile 2: Spalte 1-10 mit Eintrag 3, Spalte 11-20 mit Eintrag 0
+  Zeile 3: 1, 2, 1, 2, 1, 2, 1, 2, ...
+  Zeile 4: 1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6
+  Zeile 5: 1, 2, 1, 2, 3, 1, 2, 3, 4, 1, 2, 3, 4, 5, 0, 0, 0, 0, 0, 0
+  Zeile 6: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1
+  Zeile 7: 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 5, 6, 7, 8  
+ ```
+  Benutzen Sie keine for-Schleifen. Erstellen Sie Vektoren **nicht** derart, dass Sie 
+  die jeweiligen Einträge alle explizit befüllen, wie z.B. 
+```
+zeile4  <- c(1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6)|
+```
+	sondern versuchen Sie Funktionen wie `rep` und `seq` zur Hilfe zu nehmen.
+  Sie können die Zeilen einzeln erzeugen, z.B. `zeileX <- c(rep(2:6,times=1:5),5:1)`, und dann mittels `M <- rbind(zeile1, zeile2, zeile3,...)` zu einer Matrix kombinieren.
+```{r}
+
+```
+
+...
+
+```{r echo=FALSE}
+2+3
+# ...
+```
+
+`echo = FALSE` unterdrückt die Ausgabe des Quellcodes.
+
+```{r results=FALSE}
+5+6
+# ...
+```
+
+`result = FALSE` unterdrückt die Ausgabe des Ergebnisses.

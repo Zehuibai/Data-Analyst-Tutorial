@@ -1,0 +1,135 @@
+---
+title: "Übungsblatt 13 - Hausaufgaben"
+author: "Zehui Bai,Stefanie Do"
+date: "`r Sys.time()`"
+output: 
+  html_document: 
+    df_print: kable
+    toc: yes
+    toc_depth: 4
+    toc_float: yes
+    code_folding: show
+editor_options:
+  chunk_output_type: console
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE, error = FALSE)
+library(binom)
+library(tidyverse)
+```
+
+
+
+
+## Aufgabe 1
+
+```{r}
+
+## präsenzaufgabe 1 [ähnliches Verfahren, holfe hilfreich]
+ipo1 <- read.csv("~/Desktop/SASUniversityEdition/myfolders/Daten/ipo1.txt",header = TRUE,sep = "")
+head(ipo1)
+
+mod1 <- lm(Fruechte ~ Wurzel, data = ipo1)
+summary(mod1)
+
+plot(mod1)
+
+ggplot(data = ipo1, aes(x = Wurzel, y = Fruechte)) +
+  geom_point() +
+  geom_smooth(method = lm, se = FALSE, color = "red")
+
+
+mod2 <- lm(Fruechte ~ Wurzel * Beweidung, data = ipo1)
+anova(mod2)
+
+drop1(mod2,test="F")
+## neues Modell
+anova(lm(Fruechte ~ Wurzel + Beweidung, data = ipo1))
+summary(lm(Fruechte ~ Wurzel + Beweidung, data = ipo1))
+
+```
+
+
+
+
+## Aufgabe 2
+
+In einer Studie wurde untersucht, ob das Wachstum von Hamstern (Wachstum) vom Futter (Futter: diet1, diet2, diet3), vom Hamstertyp (Typ: dunkel, hell) und von der Region (Region: wald, wueste) abhängt. Die erfassten Daten sind im Datensatz hamster3.txt enthalten. Verwenden Sie das maximale lineare Modell (3-fache Varianzanalyse mit allen Interaktionstermen) als Ausgangsmodell und optimieren Sie das Modell nach Signifikanzen und nach AIC. Geben Sie
+das geschätzte Modell bzw. die geschätzten Mittelwerte an.
+
+```{r aufgabe2}
+hamster3 <- read.csv("~/Desktop/SASUniversityEdition/myfolders/Daten/hamster3.txt",
+                     header = TRUE,
+                     sep = "")
+str(hamster3)
+
+model1 <- lm(Wachstum ~ Typ * Futter * Region, data = hamster3)
+
+## ANOVA type 1
+anova(model1)
+
+## ANOVA type 2
+library(car)
+Anova(model1) 
+
+## ANOVA type 3
+model2 <- lm(Wachstum ~ Typ * Futter * Region, data=hamster3,
+             contrasts=list(Typ=contr.sum, Futter=contr.sum,Region=contr.sum))
+Anova(model2, type=3)
+
+## Es gibt fast kein Unterschied zwischen ANOVA type 1 und type 3
+
+
+## Modellselektion
+drop1(model1,test = "F")
+## Das Ergebnis ist nicht signifikant, dass wird Interaktionterm  Typ:Futter:Region gelöscht.
+
+model3 <- lm(Wachstum ~ Typ + Futter + Region + Typ:Futter + Typ:Region + Futter:Region, 
+             data = hamster3)
+drop1(model3, test = "F")
+## Dazu sind Interaktionterm Typ:Futter und Typ:Region nicht signifikant, werden auch gelöscht.
+
+## Das endgültige Modell ist:
+model4 <- lm(Wachstum ~ Typ + Futter + Region + Futter:Region, 
+             data = hamster3)
+## Dazu sind alle Term signifikant.
+drop1(model4, ~ Typ + Futter + Region + Futter:Region, test = "F")
+summary(model4)
+```
+
+
+
+
+## Zusatzaufgabe
+
+Betrachten Sie im Datensatz survey aus dem Paket MASS die Variablen Pulse (Pulsrate, Schläge pro Minute), Smoke (Rauchverhalten, verschiedene Kategorien), Sex und Age. Wir möchten den Zusammenhang der Variable Pulse mit den Kovariablen Smoke, Sex, Age mittels einer linearen Regressionsanalyse untersuchen. Verwenden Sie das maximale lineare Modell (3-fache Varianzanalyse mit allen Interaktionstermen) als Ausgangsmodell:
+Pulse ~ Smoke * Sex * Age
+Optimieren Sie das Modell nach Signifikanz und AIC. Geben Sie das geschätzte Modell an. Verwenden Sie α = 0.05 für Ihre Tests.
+
+```{r zusatzaufgabe}
+data(survey,package = "MASS")
+survey <- survey[complete.cases(survey), ]
+
+model_zusatz <- lm(Pulse ~ Smoke * Sex * Age, data = survey)
+anova(model_zusatz)
+
+library(car)
+Anova(model_zusatz,type=2)
+
+## Modellselektion
+library(MASS)
+stepAIC(model_zusatz,direction = "backward")
+## step(model_zusatz,test="F")
+
+## Volle Regression der Teilmenge
+## Ich nutze die R-Quadrat-Statistik, um das beste Modell auszuwählen
+library(leaps)
+survey_sub <- regsubsets(Pulse ~ Smoke * Sex * Age,data = survey,nbest=4)
+plot(survey_sub,scale = "adjr2")
+
+## Nach Step-Modellselektion sind alle Term nicht signifikant, mit Hilfe von adjustierten p-Werten steht Modell "Smoke + Sex + Age + Smoke:Age + Smoke:Sex" höchste adjustierter p-Wert
+## Das endgültige Modell ist:
+model_zusatz2 <- lm(Pulse ~ Smoke + Sex + Age + Smoke:Age + Smoke:Sex, data = survey)
+summary(model_zusatz2)
+```

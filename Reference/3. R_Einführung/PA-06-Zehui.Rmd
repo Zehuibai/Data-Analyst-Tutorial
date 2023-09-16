@@ -1,0 +1,207 @@
+---
+title: "Übungsblatt 6 - Präsenzaufgaben"
+author: "Zehui Bai"
+date: "`r Sys.time()`"
+output: 
+  html_document: 
+    df_print: kable
+    toc: yes
+    toc_depth: 4
+    toc_float: yes
+    code_folding: show
+editor_options:
+  chunk_output_type: console
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE, error = FALSE)
+```
+
+
+
+### Aufgabe 1
+
+```{r A1}
+
+bilirubin <- read.csv("~/Desktop/SASUniversityEdition/myfolders/Daten/bilirubin.txt",  sep = ";")
+set.seed(1234)
+bilirubin.sample <- bilirubin[sample(nrow(bilirubin), 1000,replace=T), ]
+bilirubin.sample <- bilirubin.sample[order(bilirubin.sample$ALTER), ]
+
+# (a)
+attach(bilirubin.sample)
+
+hist(ALTER,freq = F)
+lines(density(ALTER),col="red",lty=2)  
+
+hist(Wert,freq = F)
+lines(density(Wert), col="green")
+
+
+# (b)
+library(ggplot2)
+ggplot(bilirubin.sample, aes(x = ALTER)) +
+  geom_histogram(aes(color = SEX, fill = SEX), 
+                position = "identity", bins = 30, alpha = 0.4) +
+  scale_color_manual(values = c("#00AFBB", "#E7B800")) +
+  scale_fill_manual(values = c("#00AFBB", "#E7B800"))
+
+
+# (c)
+ggplot(bilirubin.sample, aes(x=SEX, y=Wert, fill=SEX)) + 
+    geom_boxplot()
+
+detach()
+```
+
+
+### Aufgabe 2
+
+```{r echo=TRUE}
+data(iris)
+
+opar <- par()
+par(mfrow=c(2,2))
+name <- names(iris[,-5])
+for (i in 1:4){
+  hist(iris[,i],freq = F,main = "Histogram of name[i]")
+}
+opar
+
+
+
+data(iris)
+opar <- par()
+par(mfrow=c(2,2))
+for (i in 1:4){
+  boxplot(iris[,i]~iris[,5], outline=FALSE, col="gray90", boxwex=0.5)
+}
+opar
+
+
+p1 <- ggplot(iris, aes(x=Species, y=iris[,1], fill=Species)) + geom_boxplot() 
+p2 <- ggplot(iris, aes(x=Species, y=iris[,2], fill=Species)) + geom_boxplot() 
+p3 <- ggplot(iris, aes(x=Species, y=iris[,3], fill=Species)) + geom_boxplot() 
+p4 <- ggplot(iris, aes(x=Species, y=iris[,4], fill=Species)) + geom_boxplot() 
+
+library(gridExtra)
+grid.arrange(p1,p2,p3,p4,nrow = 2, top = "Aufgabe 2a")
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### Aufgabe 3
+
+Laden Sie den Datensatz **airquality**. Wir betrachten die Merkmale **Ozone**, **Solar.R**, **Wind** und **Temp** in diesem Datensatz.
+
+```{r A3a}
+data("airquality")
+pairs(airquality[,1:4], pch = 19)
+
+cbind(cor(airquality[,1:4],
+          method = c("pearson"),
+          use = "complete"),
+      Methode=rep("pearson",4))
+    ## 提供了一种在缺少值的情况下计算协方差的方法 "everything", "all.obs", "complete.obs", "na.or.complete", or "pairwise.complete.obs".
+
+cov(airquality[,1:4],method = c("kendall"),use = "complete")
+
+
+set.seed(123)
+rnorm(1000)
+
+
+
+
+
+
+
+
+
+
+
+airquality %>%
+  select(Ozone:Temp) %>%
+  gather() %>%
+  ggplot(data = ., aes(x = value)) +
+  geom_histogram(bins = 35) +
+  facet_wrap(~key, ncol = 1, scales = "free")
+```
+
+
+
+### Aufgabe 4
+
+Den Datensatz **m111survey** aus dem Paket **tigerstats** haben wir in Blatt 5 untersucht. Wir möchten den Zusammenhang zwischen den Variablen **fastest** und **sex** mit Hilfe von gruppierten Boxplots veranschaulichen.
+
+```{r A4}
+data("m111survey", package = "tigerstats")
+
+ggplot(data = m111survey, aes(x = sex, y = fastest)) +
+  geom_boxplot()
+```
+
+
+### Aufgabe 5
+
+#### a) 
+
+Generieren Sie 1000 Daten aus der $N(0,1)$-Verteilung (`rnorm(1000)`).
+
+```{r A5a}
+random <- rnorm(1000)
+```
+
+
+#### b)
+
+Plotten Sie das Histogramm der Daten und beschriften Sie die Achsen und den Titel.
+
+```{r A5b}
+ggplot(data = NULL, aes(x = random)) +
+  geom_histogram(aes(y = stat(density)), binwidth = .25) +
+  labs(title = "Random numbers from N(0, 1",
+       x = "Number", y = "Density")
+```
+
+
+#### c)
+
+Schätzen Sie eine geglättete Dichtefunktion (`density()`) für die Daten und fügen Sie diese Dichtefunktion in das Histogramm ein.
+
+```{r A5c}
+ggplot(data = NULL, aes(x = random)) +
+  geom_histogram(aes(y = stat(density)), binwidth = .25, alpha = .5) +
+  geom_density() +
+  labs(title = "Random numbers from N(0, 1",
+       x = "Number", y = "Density")
+```
+
+
+#### d) 
+
+Fügen Sie die Dichtefunktion der $N(0,1)$-Verteilung dem oben-erstellten Bild hinzu.
+(Hinweis: `curve(dnorm(x), add = T)`).
+
+```{r A5d}
+ggplot(data = NULL, aes(x = random)) +
+  geom_histogram(aes(y = stat(density)), binwidth = .25, alpha = .5) +
+  geom_density(aes(color = "Estimated Kernel Density")) +
+  stat_function(aes(color = "Standard Normal Distribution"), fun = dnorm) +
+  scale_color_brewer(palette = "Set1") +
+  labs(title = "Random numbers from N(0, 1)",
+       x = "Number", y = "Density", color = "") +
+  theme(legend.position = "top")
+```

@@ -1,0 +1,241 @@
+---
+title: "Aufgabe 5"
+subject: "R Einführung"
+author: "Zehui Bai,Stefanie Do"
+date: 'Stand: `r format(Sys.time(), "%F %H:%M Uhr")`'
+output:
+  html_document:
+    df_print: paged
+    toc: yes
+    toc_float: yes
+    number_sections: true
+    theme: darkly
+editor_options:
+  chunk_output_type: console
+fontsize: 10pt
+colorlinks: yes
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, error = FALSE, warning = FALSE)
+library(knitr)
+```
+
+# Aufgabe 1 (12 Punkte)
+
+> Der Datensatz Arthritis aus dem Package vcd enthält die Studienergebnisse zur Wirkung einer Behandlungsmethode bei Arthritis-Patienten. Der Datensatz enthält die Patientennummer (ID), die Behandlungsart (Treatment), das Geschlecht (Sex), das Alter (Age) und die Wirkung der Behandlung (Improved).
+
+## (a) 
+
+> Erstellen Sie 1-, 2- und 3- dimensionale Kontingenztafeln für die nominal-skalierten Merkmale Treatment, Sex und Improved.
+
+```{r aufgabe1a,echo=TRUE}
+require(vcd)
+arth <- data.frame(Arthritis)
+
+# 1-dimensional
+lapply(c("Sex", "Age", "Improved"), function(x) table(arth[x]))
+
+# 2-dimensional
+table(arth$Sex, arth$Age)
+table(arth$Sex, arth$Improved)
+table(arth$Age, arth$Improved)
+
+# 3 Dimensionen: but why?
+table(arth$Sex, arth$Age, arth$Improved)
+```
+
+---
+
+**Korrektur:** Falsche Merkmale betrachtet -- `Age` sollte nicht betrachtet werden, aber `Treatment`. Es wurde keine 3-dimensionale Kontingenztabelle erstellt, sondern ein 3-d-Array. Korrektur dafür z.B.:
+```{r}
+structable(Improved~Treatment+Sex, data=Arthritis)
+# oder
+ftable(Arthritis, row.vars = "Sex", col.vars = c("Treatment","Improved"))
+```
+
+---
+
+## (b) 
+
+> Stellen Sie die Verteilung des Merkmals Improved nach Treatment für Männer und für Frauen getrennt mit Hilfe von Kreisdiagrammen dar und speichern Sie alle Graﬁken in einer pdf-Datei. Benutzen Sie dafür die Funktion layout, um Ihre Graﬁken in einer geeigneten Reihenfolge und Größe zu demonstrieren.
+
+```{r}
+arth.Improved <- split(arth,arth[,c("Treatment","Sex")])
+
+library(ggplot2)
+library(gridExtra)
+
+arth.Improved.plot <- function(data.table,title){
+  a <- table(data.table$Improved)
+  b <- as.data.frame(a)
+  ggplot(b, aes(x="Improved", y=Freq, fill=Var1)) +
+  geom_bar(width = 2, stat = "identity") +
+  geom_col(position = position_stack()) +
+  coord_polar(theta = "y", start = 0) +
+  theme_void() +
+  theme(legend.position = "top")+ 
+  ggtitle(title)
+}
+
+p1 <- arth.Improved.plot(arth.Improved$Placebo.Female,"Placebo.Female")
+p2 <- arth.Improved.plot(arth.Improved$Treated.Female,"Treated.Female")
+p3 <- arth.Improved.plot(arth.Improved$Placebo.Male,"Placebo.Male")
+p4 <- arth.Improved.plot(arth.Improved$Placebo.Female,"Placebo.Female")
+
+# save as PDF
+# pdf(file = "~/Desktop/R-Einführung/R_Kurs/arth.Improved.pieplot.pdf", bg = "transparent")
+grid.arrange(p1,p2,p3,p4,
+  nrow = 2, top = "Improved getrennt nach Treatment für Männer und für Frauen")
+```
+
+---
+
+**Korrektur:** Placebo.Female wurde zweimal geplottet, aber Treated.Male fehlt im Plot. 
+
+**Hinweis:** Es geht auch mit einer Schleife:
+```{r}
+library(scales)
+arth.Improved.plot2 <- function(data.table,title){
+  a <- table(data.table$Improved)
+  b <- as.data.frame(a)
+  ggplot(b, aes(x="Improved", y=Freq, fill=Var1)) +
+    geom_bar(width = 2, stat = "identity") +
+    geom_col(position = position_stack()) +
+    coord_polar(theta = "y", start = 0) +
+    theme_void() +
+    theme(legend.position = "top")+
+    geom_text(aes(y = sum(Freq) - 0.5*Freq - c(0, cumsum(Freq)[-length(Freq)]), 
+                  label = ifelse(Freq==0,"",percent(Freq/sum(Freq)))), size=5)+ 
+    ggtitle(title)
+}
+
+plist <- list()
+for (i in 1:4) plist[[i]] <- arth.Improved.plot2(arth.Improved[[i]],names(arth.Improved)[i])
+# save as PDF
+# pdf(file = "~/Desktop/R-Einführung/R_Kurs/arth.Improved.pieplot.pdf", bg = "transparent")
+grid.arrange(grobs=plist, nrow = 2, top = textGrob("Improved getrennt nach Treatment für Männer und für Frauen",gp=gpar(fontsize=12,font=3)))
+
+```
+
+---
+
+## (c)
+
+>Veranschaulichen Sie nun die Verteilung des Merkmals Improved nach Treatment mit Hilfe von gruppierten Balkendiagrammen.
+
+```{r aufgabe1c}
+
+a <- table(arth$Sex,arth$Treatment,arth$Improved)
+a <- as.data.frame(a)
+names(a) <- c("Sex","Treatment","Improved","Anzahl")
+ggplot(data = a, aes(x = Treatment, y = Anzahl, fill = Improved)) +
+  geom_col() +
+  facet_wrap(~Sex, ncol = 2) +
+  theme_minimal() +
+  theme(legend.position = "top")
+```
+
+---
+
+**Hinweis:** Aufteilung nach `Sex` war nicht notwendig, ist aber ok.
+
+**Bewertung:** 10/12
+
+---
+
+# Aufgabe 2 (8 Punkte)
+
+> Den Datensatz m111survey im Paket tigerstats (Datensatz auch in StudIP vorhanden) enthält die Daten von StudentInnen des Georgetown College.
+
+## (a) 
+
+>Welche Variablen in diesem Datensatz sind qualitative Merkmale?
+
+```{r aufgabe2a}
+m111survey <- read.csv("~/Desktop/SASUniversityEdition/myfolders/Daten/m111survey.txt",header = TRUE,sep = "")
+# m111survey <- read.csv("m111survey.txt",header = TRUE,sep = "")
+str(m111survey)
+```
+
+**Qualitative Variablen**:weight_feel,love_first,extra_life,seat,enough_Sleep,sex
+
+
+## (b) 
+
+>Erstellen Sie mit Hilfe der Funktionen structable() und ftable() informative Tabellen in Bezug auf die qualitativen Merkmale aus diesem Datensatz.
+
+```{r aufagbe2b}
+library(vcd)
+#astructable(weight_feel+love_first +extra_life~ sex + enough_Sleep + seat, data = m111survey)
+structable(weight_feel+love_first +extra_life~ sex + enough_Sleep + seat, data = m111survey)
+ftable(m111survey[,c(5,6,7,8,10,11)], row.vars = 1:3, col.vars = 4:6)
+```
+
+---
+
+**Bewertung:** Die Tabellen decken die gesamte Information ab, sind aber dadurch unübersichtlich. Informativer wäre es, mehrere Häufigkeitstabellen/Kontingenztafeln für 2 bis 3 Merkmale darzustellen, um besondere Zusammenhänge hervorzuheben, z.B.:
+```{r}
+survf <- m111survey[,sapply(m111survey, is.factor)]
+ftable(survf, row.vars = "sex", col.vars = c("extra_life","love_first"))
+```
+Die Tabellen sollten dann interpretiert werden.: Frauen neigen eher dazu an die Liebe auf den ersten Blick zu glauben, als Männer. Männer neigen mehr als Frauen dazu, an Außerirdische zu glauben.
+
+---
+
+## (c) 
+
+>Stellen Sie die Verteilung der qualitativen Merkmalen graphisch dar. Sie können dazu z.B. Tortendiagramme und (einfache oder gruppierte) Balkendiagramme zurückgreifen.
+
+```{r aufgabe2c}
+library(ggplot2)
+ggplot(data = m111survey, aes(x = weight_feel, fill = enough_Sleep)) +
+  geom_bar() +
+  facet_wrap(~sex) +
+  theme(legend.position = "top")
+
+ggplot(data = m111survey, aes(x = extra_life, fill = love_first)) +
+  geom_bar() +
+  facet_wrap(~seat) +
+  theme(legend.position = "top")
+```
+
+---
+
+**Bewertung:** Hier sollten insgesamt noch mehr Zusammenhänge herausgearbeitet werden und interpretiert werden, daher 5.5/8
+
+---
+
+
+# Zusatzaufgabe: (6 Punkte)
+
+> Wenden Sie die Funktion `mosaicplot(...)` auf den Titanic-Datensatz an, um informative Graﬁken zu erstellen. Interpretieren und kommentieren Sie die Graﬁken.
+
+```{r zusatz}
+library(vcd)
+str(Titanic)
+mosaic(Titanic, shade=TRUE, legend=TRUE, 
+       main = "Titanic nach 4 Variable: Class Sex Age Survived")
+```
+
+**Interpretation**: 
+
+Insgesamt befanden sich relativ wenige Kinder auf der Titanic, bei denen ein signifikant positiver Zusammenhang beim Überleben in der ersten und zweiten Klasse zu beobachten ist. Gestorben sind eher Kinder, die zu der 3.Klasse und der Crew gehören.
+
+Bei den Erwachsenen haben vor allem Männer, die der Crew angehören, nicht überlebt. Ein signifikant negativer Zusammenhang ist bei Männern in der ersten Klassen beim Überleben und Nichtüberleben zu beobachten, d.h. sie haben entweder eine geringe Wahrscheinlichkeit zu überleben oder zu sterben (vergleichsweise mehr). In der zweiten und dritte Klasse ist der geringe Anteil an Männern eher gestorben.
+Bei Frauen in höheren Klassen hingegen ist der relative Anteil zu überleben, welcher sowohl mit positiven Zusammenhängen beim Überleben (1.-3. Klasse) und negativen Zusammenhängen (1.-2. Klasse) dargestellt wird, insgesamt höher. Die Ausnahme bildet der relativ geringe Anteil von verstorbenen Frauen in der Crew.
+
+Zusammenfassend lässt sich sagen, dass Kinder und Frauen, vor allem in höheren Klassen, überlebt haben. Bei Männern in höheren Klassen ist die Wahrscheinlichkeit zu überleben vergleichsweise geringer, wobei vor allem Männer in der ersten Klasse überlebt haben. Der Großteil der Nichtüberlebenden befindet sich unter Männern in der Crew.
+
+---
+
+**Bewertung:** Das ist so von der Interpretation in Ordnung. Es sollten mehrere Grafiken erstellt werden, aber es wurde nur 1 Grafik erstellt. Man könnte zusätzlich noch Mosaikplots zu Subgruppen erstellen. Nützlich ist auch der Parameter `color=T`, um die Übersicht zu verbessern:
+```{r}
+mosaicplot(~ Sex + Age + Survived, data = Titanic, main = "Survival on the Titanic", color = TRUE)
+mosaicplot(~ Class + Survived, data = Titanic, main = "Survival on the Titanic", color = TRUE)
+```
+2.5/3 Punkte
+
+**Insgesamt:**
+15.5 +  2.5 Bonuspunkte
+---

@@ -1,0 +1,205 @@
+---
+title: "Aufgabe 5"
+subject: "R Einführung"
+author: "Zehui Bai"
+date: "`r Sys.time()`"
+fontsize: 10pt
+colorlinks: yes
+boldstyle: TeX
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    df_print: paged
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, error = FALSE, warning = FALSE)
+library(ggplot2)
+```
+
+
+# Aufgabe 1
+
+```{r}
+set.seed(123)
+klasse <- sample(1:6, size = 60, replace = TRUE, prob = c(.05, .2, .5, .2, .03, .02))
+```
+
+## a)
+
+```{r}
+table(klasse)
+prop.table(table(klasse))
+cumsum(table(klasse))
+```
+
+## b)
+
+```{r}
+table1 <- table(klasse)
+relativ_table1 <- round(prop.table(table(klasse))*100,1)
+pie(table1,col=c("purple", "violetred1", "green3","cornsilk", "cyan", "white"),
+    labels=relativ_table1,
+    radius = 0.8, clockwise = TRUE, 
+    main="Präsenzaufgabe 1(c) Pieplot %")
+
+barplot(table1,col=c("blue", "red","salmon2","royalblue4","salmon4","salmon1"),
+        names.arg=c("Level 1", "Level 2", "Level 3","Level 4", "Level 5", "Level 6"),
+        space=1.5,  main="Präsenzaufgabe 1(c) Barplot", ylab="Anzahl")
+
+```
+
+
+## d)
+
+```{r}
+mat1 <- rbind(c(1,1,2), c(1,1,0))
+
+layout(mat1)
+layout.show(2) 
+
+barplot(table(klasse))
+pie(table(klasse))
+```
+
+
+## e)
+
+```{r}
+mat2 <- matrix(1:1, 1, 1)
+layout(mat2)
+# reset 
+dev.off()
+
+# Alternativ
+klasse.df <- as.data.frame(table(klasse))
+klasse.df$prop <- round((klasse.df$Freq/sum(klasse.df$Freq)) * 100, 1)
+
+ggplot(data = klasse.df, aes(x = NA, y = Freq, fill = klasse)) +
+  geom_col(position = "stack", color = "black") +
+  coord_polar(theta = "y") +
+  scale_fill_brewer(palette = "Set1") +
+  geom_text(aes(label = paste0(prop, "%"), x = 1.575), 
+            position = position_stack(vjust = .5)) +
+  labs(fill = "Note") +
+  theme_void()
+
+pie <- ggplot(klasse.df, aes(x="", y=Freq, fill=klasse)) +
+  geom_bar(width = 1, stat = "identity") +
+  coord_polar("y", start=0); pie
+# coord_polar  Koordinatensystem spiegeln
+
+
+ggplot(data = as.data.frame(klasse), aes(x = klasse)) +
+  geom_bar() +
+  theme_minimal() +
+  labs(title = "Notenverteilung", y = "Häufigkeit", x = "Note")
+```
+
+
+# Aufgabe 2
+
+## a)
+
+```{r}
+library(readr)
+bakterien <- read_delim("~/Desktop/SASUniversityEdition/myfolders/Daten/bakterien.txt", delim = " ")
+a <- table(bakterien$resistenz)
+
+resistenz_table <- as.data.frame(a)
+resistenz_table$prop <- round(resistenz_table$Freq/sum(resistenz_table$Freq)*100,1)   
+a <- as.factor(a)
+ 
+ggplot(data = resistenz_table, aes(x = NA, y = Freq, fill = a))+
+  geom_col(position = "stack", color = "black") +
+  coord_polar(theta = "y") +
+  scale_fill_brewer(palette = "Set1") +
+  geom_text(aes(label = paste0(prop, "%"), x = 1.575), 
+            position = position_stack(vjust = .5)) +
+  labs(fill = "Note") +
+  theme_void()     
+      
+      
+ggplot(resistenz_table, aes(x="", y=Freq, fill=a)) +
+  geom_bar(width = 1, stat = "identity") +
+  coord_polar("y", start=0); pie    
+    
+```
+
+## b&d)
+
+```{r}
+bakterien$resistenz <- factor(bakterien$resistenz, labels = c("sehr sensitiv", "sensitiv", "intermediär", "resistent", "sehr resistent"))
+bakterien$farbe <- factor(bakterien$farbe, labels = c("gelb", "weißlich", "braun", "orange", "farblos", "rosa", "grün"))
+
+layout(rbind(c(1, 2), c(3, 4)))
+barplot(table(bakterien$farbe))
+pie(table(bakterien$farbe),radius = 2.2)
+barplot(table(bakterien$resistenz))
+pie(table(bakterien$resistenz),radius = 2.2)
+```
+
+## c)
+
+```{r}
+png(file = "~/Documents/R-Einführung/R_Kurs/myplot.png", bg = "transparent")
+  # png支持透明背景：使用bg =“ transparent”
+ggplot(data = resistenz_table, aes(x = NA, y = Freq, fill = a))+
+  geom_col(position = "stack", color = "black") +
+  coord_polar(theta = "y") +
+  scale_fill_brewer(palette = "Set1") +
+  geom_text(aes(label = paste0(prop, "%"), x = 1.575), 
+            position = position_stack(vjust = .5)) +
+  labs(fill = "Note") +
+  theme_void()    
+
+dev.off()
+```
+
+
+# Aufgabe 3
+
+## a)
+
+```{r}
+library(vcd)
+data(Titanic)
+tab_Sex      <- structable(~ Sex, data = Titanic)
+tab_Class    <- structable(~ Class, data = Titanic)
+tab_Age      <- structable(~ Age, data = Titanic)
+tab_Survived <- structable(~ Survived, data = Titanic)
+
+structable(Titanic)
+
+structable(Titanic[1,1, , ])
+
+structable(Titanic, direction = c("h","h","v","v"))
+structable(Titanic, split_vertical = c(TRUE, TRUE, FALSE, FALSE))
+```
+
+## b)
+```{r echo=TRUE}
+tab1 <- structable(Survived ~ Sex, data = Titanic);tab1
+tab2 <- structable(Sex+Age ~ Class+Survived, data = Titanic)
+tab3 <- ftable(Titanic, row.vars = "Class", col.vars = "Survived")
+tab4 <- ftable(Titanic, row.vars = 1:2, col.vars = 3:4)
+```
+
+## c)
+```{r}
+dev.off()
+library(vcd)
+data(Titanic)
+barplot(ftable(Titanic, row.vars=1, col.vars=4),
+             legend=dimnames(Titanic)$Class,
+             names.arg=dimnames(Titanic)$Survived,
+             beside=TRUE, xlab="Survived")
+```
+
+
+
+
+
