@@ -101,3 +101,15 @@ cheat-sheet-3
 package-lubridate
 cheat-sheet-4
 import-csv-data-1
+fig:unnamed-chunk-1
+lifecycle-of-data-analysis-project
+load-data
+system-seeting
+fig:unnamed-chunk-2
+basis-system-seeting
+help-and-packages
+create-script
+basic-mathematische-operatoren-funktionen
+data-type
+objects-in-r
+function-in-r

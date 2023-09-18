@@ -1,0 +1,229 @@
+---
+title: "Übungsblatt 10 - Hausaufgaben"
+author: "Zehui Bai,Stefanie Do"
+date: "`r Sys.time()`"
+output: 
+  html_document: 
+    df_print: kable
+    toc: yes
+    toc_depth: 4
+    toc_float: yes
+    code_folding: show
+editor_options:
+  chunk_output_type: console
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE, error = FALSE)
+library(pwr)
+```
+
+
+
+
+
+## Aufgabe 1
+
+Berechnen Sie die benötigte Fallzahl zur Absicherung dieses Eﬀekts.
+
+```{r aufgabe 1a}
+Fallzahl <- pwr.t.test(d = -10/20, power = .9, type = "two.sample", alternative = "less")$n
+ceiling(Fallzahl)
+
+# alternative
+ceiling(power.t.test(delta = 10/20, power = .9, alternative = "one.sided")$n)
+```
+
+die benötigte Fallzahl zur Absicherung dieses Eﬀekts ist 70.
+
+
+
+
+
+Wie groß soll der tatsächliche Effekt (Blut- zuckerwertsenkung) sein?
+
+```{r aufgabe 1b}
+power.t.test(n = 40, delta = NULL, sd = 10, power = .9, alternative = "one.sided")$delta
+
+## pwr.t.test(n = 40, d = NULL,  power = .9, type = "two.sample", alternative = "less")
+```
+
+
+---
+
+**Korrektur:** Ein Test für gepaarte Stichproben würde besser passen; z.B.:
+```{r}
+# a)
+ceiling(power.t.test(delta = 10, sd=20, power = .9, alternative = "one.sided", type="paired")$n)
+# b)
+power.t.test(n = 40, delta = NULL, sd = 10, power = .9, alternative = "one.sided", type="paired")$delta
+# oder
+pwr::pwr.t.test(n = 40, d = NULL,  power = .9, type = "paired", alternative = "less")$d*10
+```
+
+**Bewertung:** 5 von 6 Punkten
+
+---
+
+
+## Aufgabe 2
+
+```{r aufgabe 2a}
+data(normtemp, package = "UsingR")
+normtemp$gender <- factor(normtemp$gender,labels = c("Mann","Frau"))
+
+
+## Für 2-Stichproben ist F-Test gleich wie T-test
+## t.test(temperature~gender, data=normtemp)
+normtemp.aov <- aov(temperature~gender, data=normtemp)
+summary(normtemp.aov)
+
+library("ggpubr")
+ggboxplot(normtemp, x = "gender", y = "temperature", 
+          color = "gender", palette = c("#00AFBB", "#E7B800"),
+          ylab = "Temperature", xlab = "Geschlecht")
+```
+
+**Interpretation**
+
+P-Wert = 0.0239 ist kleiner als $\alpha=0.05$, die Nullhypothese kann abgelegnt werden. Die Körpertemperatur ist vom Geschlecht abhängig, d.h. Männer haben im Durchschnitt eine niedrigere Körpertemperatur als Frauen.
+
+
+
+
+
+```{r aufgabe 2b}
+library(dplyr)
+Diff <- 
+  normtemp %>% 
+  group_by(gender) %>% 
+  summarise(mean = mean(temperature))
+
+Differenz_der_Mittelwerte <- diff(Diff$mean)
+n <- length(normtemp$gender)/2
+
+power.t.test(n = n, delta = Differenz_der_Mittelwerte)$power
+```
+
+**Interpretation**
+
+Die Power des Tests muss 0.3732 betragen, um die beobachtete Differenz der Mittelwerte als signifikant erkennen zu können.
+
+
+
+
+
+
+```{r aufgabe 2c}
+ceiling(power.t.test(power = 0.8, delta = Differenz_der_Mittelwerte)$n)
+```
+
+**Interpretation**
+
+Die benötigte Fallzahl von 189 wird zur Absicherung dieser Differenz benötigt, um eine Power von mindestens 0.80 zu erreichen
+
+---
+
+**Korrektur:** `sd` wurde nicht festgelegt und somit eine Standardabweichung von 1 unterstellt. Es soll hier ein sinnvoller Schätzer für die gemeinsame Standardabweichung übergeben werden. Wir können unter Annahme gleicher Varianzen die Formel aus Folie Nummer 546 benutzen. In R-Code z.B.:
+
+```{r}
+# pooled sd
+spldat <- split(normtemp$temperature, normtemp$gender) 
+sigma <- sqrt(((length(spldat[[1]])-1)*sd(spldat[[1]])^2 + (length(spldat[[2]])-1)*sd(spldat[[2]])^2 ) / ((length(spldat[[1]])-1)+ (length(spldat[["1"]])-1)))
+# b)
+power.t.test(n = n, delta = Differenz_der_Mittelwerte, sd = sigma)$power
+# c)
+ceiling(power.t.test(power = 0.8, delta = Differenz_der_Mittelwerte, sd = sigma)$n)
+```
+
+**Bewertung:** 6.5 von 8 Punkten
+
+---
+
+
+
+
+
+
+## Aufgabe 3
+
+```{r aufgabe 3a}
+data(iris)
+library(multcomp)
+library(broom) 
+
+paarweisen_t_test <- function(var){
+  iris.aov <- aov(var~Species,data = iris)
+  bonferroni <- summary(glht(iris.aov, linfct = mcp(Species = "Tukey")),
+                        test = adjusted(type = "bonferroni"))
+  ## Konfidenzintervall Plot
+  ## plot(confint(bonferroni, level = 0.95))
+  holm <- summary(glht(iris.aov, linfct = mcp(Species = "Tukey")),
+                  test = adjusted(type = "holm"))
+  list <- list(tidy(bonferroni),tidy(holm))
+  return(list)
+}
+
+paarweisen_t_test(var=iris$Sepal.Length)
+```
+
+**Interpretation**
+
+Die Nullhypothese für die Mittelwerte von Sepal.Length kann nicht abgelehnt werden, d.h. sie unterscheiden sich nicht bei den Species.
+
+---
+
+**Korrektur:** Doch, alle p-Werte sind sehr klein. Für alle paarweisen Vergleiche wird die Nullhypothese abgelehnt.
+
+---
+
+
+```{r aufgabe 3b}
+paarweisen_t_test(var=iris$Sepal.Width)
+paarweisen_t_test(var=iris$Petal.Length)
+paarweisen_t_test(var=iris$Petal.Width)
+```
+
+**Interpretation**
+
+* Die Nullhypothese für die Mittelwerte von Sepal.Width kann nicht abgelehnt werden, d.h. sie unterscheiden sich nicht bei den Species.
+* Die Nullhypothese für die Mittelwerte von Petal.Width kann abgelehnt werden, d.h. sie unterscheiden sich bei den Species.
+* Die Nullhypothese für die Mittelwerte von Petal.Width kann abgelehnt werden, d.h. sie unterscheiden sich bei den Species.
+
+---
+
+**Korrektur:** auch hier: alle p-Werte sind sehr klein. Für alle paarweisen Vergleiche wird die Nullhypothese abgelehnt.
+
+**Bewertung:** 7.5/9 -- Aufgabe sehr interessant gelöst. Einfacher wäre es natürlich mit der Funktion `pairwise.t.test`.
+
+**Insgesamt:** 19 von 23 Punkten.
+
+---
+
+
+
+## Zusatzaufgabe
+
+Wahl des Wegs durch Dodekaeder =Körper mit zwölf Flächen (2 Mal werfen und Augenzahlen multiplizieren):
+
+1.Weg: Gerades Produkt der Augenzahlen und nicht durch 7 teilbar
+- Behinderung: p=0.25 sich bei Nacht zu verlaufen
+
+2.Weg: Gerades Produkt der Augenzahlen und durch 7 teilbar
+- Behinderung: Nach verlaufen auf 1.Weg mit p=0.25 bei Nacht, gelangt man mit p=0.2 auf 2.Weg;
+                Flusstal mit p=0.1 dichtem Nebel
+
+3.Weg: Ungerades Produkt der Augenzahlen
+- Behinderung: Einsiedler ist ein Werwolf (kann Zielerreichung mit p= 0.9 gefähreden) oder Mensch (keine Gefährdung)
+
+Aufgabe: 
+Simulation: 1,000 Mal; Bedingung: Einsiedler ist Werwolf
+
+Kontigenztafel und Plots:
+- Wie oft verlaufen (1.Weg)
+- Wie oft im Nebel gerastet (2.Weg)
+- Wie oft dem Werwolf begegnet (3.Weg)
+- Wie oft insgesamt morgens (= keine Behinderungen) oder später (2 Möglichkeiten für spätere Ankunft am Mittag: (1) nach Rast bei dichtem Nebel auf 2.Weg, oder (2) Verlaufen auf 1.Weg und 2.Weg nicht gefunden) am Ziel angekommen
+
+Binomialtest: 
+Wahrscheinlichkeit noch am Morgen anzukommen größer als 50%? (p > 0.5)

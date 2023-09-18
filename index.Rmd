@@ -12,6 +12,14 @@ Data analysis is the process of examining and interpreting data to extract meani
 The R Project for Statistical Computing is hosted at https://www.r-project.org/. R can be downloaded from  CRAN at the following address: https://cran.r-project.org/mirrors.html. R is an open-source software which  is free to use. An open-source software is a software that can be accessed, used, or modified by  anybody. There is no one company which has the sole powers in this case. R was initially released in  1993 and was heavily built upon the previously created S programming language which originated from 1976. In addition to using R, there are Graphic-User-Interfaces available (GUIs) to use with R. One popular R  GUI is RStudio. RStudio is available for free online [https://rstudio.com/products/rstudio/]
 
 
+##  Lifecycle of Data Analysis Project
+
+```{r, echo=FALSE, fig.align="center", out.width = '100%',fig.cap="Lifecycle of Data Analysis Project"}
+knitr::include_graphics("./02_Plots/01_DS_Lifecycle.png") 
+```
+
+
+
 ## Course Content
 
 * Data Management
@@ -42,3 +50,4 @@ The R Project for Statistical Computing is hosted at https://www.r-project.org/.
     * Mixed Model
     * Multiple Imputation
     * Meta Analysis
+    

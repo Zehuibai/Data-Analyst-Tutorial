@@ -1,0 +1,260 @@
+---
+title: "Übungsblatt 7 - Hausaufgaben"
+author: "Zehui Bai,Stefanie Do"
+date: "`r Sys.time()`"
+output: 
+  html_document: 
+    df_print: kable
+    toc: yes
+    toc_depth: 4
+    toc_float: yes
+    code_folding: show
+editor_options:
+  chunk_output_type: console
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE, error = FALSE)
+```
+
+# Aufgage 1
+
+Plotten Sie die Dichtefunktionen der Gammaverteilungen mit den Parametern shape=1:10 und scale=1 in einer gemeinsamen Grafik. Verwenden Sie verschiedene Farben oder/und Linientypen.
+
+```{r aufgabe1}
+x = seq(0, 20, 0.1)
+plot <- data.frame(x = x,
+                   y1 = dgamma(x,1,1),
+                   y2 = dgamma(x,2,1),
+                   y3 = dgamma(x,3,1),
+                   y4 = dgamma(x,4,1),
+                   y5 = dgamma(x,5,1),
+                   y6 = dgamma(x,6,1),
+                   y7 = dgamma(x,7,1),
+                   y8 = dgamma(x,8,1),
+                   y9 = dgamma(x,9,1),
+                   y10 = dgamma(x,10,1))
+## Frage: Wie 10 Variablen direkt und effizienter generiert werden? 
+
+library(tidyr)
+plot_long <- gather(plot,y,value,-x)
+
+library(ggplot2)
+ggplot(plot_long, aes(x = x, y = value, color = y)) +
+  geom_line() +
+  scale_color_viridis_d() +
+  labs(title = "Gammaverteilungen mit den Parametern shape=1:10",
+       x = "x", y = "shape=1:10")
+```
+
+---
+
+**Hinweis zur Frage:**
+```{r}
+plot <- mapply(dgamma, shape=setNames(1:10, paste0("y",1:10)), MoreArgs = list(x=x))
+plot <- cbind(x,as.data.frame(plot))
+# statt setNames geht auch: structure(1:10, names=paste0("y",1:10))
+
+# oder tidy (mit tibbles):
+plot <- purrr::map_dfc(.x = setNames(1:10, paste0("y",1:10)), .f=dgamma, x=x)
+# Achtung, hier ist noch keine Spalte mit den Werten x vorhanden
+```
+
+**Hinweis:** vgl. zu `gather` -- eine ähnliche Funktion liefert `stack`
+
+**Achtung:** Im Plot steht als y-Achsenbeschriftung "shape=1:10", dort sollte aber "Dichte" stehen.
+
+**Bewertung:** 4/4
+
+---
+
+# Aufgabe 2
+
+Berechnen Sie die folgenden Integrale mit der Monte-Carlo-Simulationsmethode.
+
+```{r aufgabe2}
+f_1 <- function(x) {
+  log(1-tan(x^3/2))
+}
+mean(f_1(runif(1e6, 0, 1)))
+
+
+f_2 <- function(x, y) {
+  sin(x + y)
+}
+mean(f_2(runif(1e6, 0, 1), runif(1e6, 0, 1)))
+
+
+f_3 <- function(x, y) {
+  0.5 * x^2 - 0.5 * y^2
+}
+6 * 6 * mean(f_3(runif(1e6, -3, 3), runif(1e6, -3, 3)))
+```
+
+---
+
+**Bewertung:** 6/6
+
+---
+
+# Aufgabe 3
+
+Verwenden Sie diese sogenannte hit and miss (Treffer-Nicht Treffer) Monte Carlo-Methode, um die Integrale aus Präsenzaufgabe 4 zu berechnen und vergleichen Sie die Ergebnisse
+
+```{r aufgabe3}
+## Präsenzaufgabe 4a(1)
+f_4 <- function(x) {
+  exp(x^2)
+}
+
+## Rechteck
+ggplot(data.frame(x = seq(-1, 1, 0.1)), aes(x))+
+  stat_function(fun = f_4)+
+  ylim(0,exp(1))
+
+## data simulation  
+data <- data.frame(n = 1:10000,
+                   x = runif(10000,-1,1),
+                   y = runif(10000,0,exp(1)))
+
+data$treffer <- 0
+data$treffer[data$y <= exp((data$x)^2)] <- 1
+
+## Integral rechnen
+Integral <- sum(data$treffer==1)/10000*2*exp(1)
+Integral
+
+## Visualisierung
+ggplot(data, aes(x = x, y = y, color = treffer)) +
+  stat_function(fun = f_4)+
+  geom_point()
+
+
+
+
+
+
+
+## Präsenzaufgabe 4a(2)
+f_5 <- function(x) {
+  log(1 + tan(x)^2)
+}
+## Rechteck
+ggplot(data.frame(x = seq(0, pi/8, 0.01)), aes(x))+
+  stat_function(fun = f_5)+
+  ylim(f_5(0),f_5(pi/8))
+```
+
+---
+
+**Hinweis:** ylimmuss von 0 bis zum Maximum gehen (hier ist `f_5(0)` ok, da `f_5(0)=0`)
+
+---
+
+```{r aufgabe3c}
+## data simulation           
+data2 <- data.frame(n = 1:10000,
+                    x = runif(10000,0, pi/8),
+                    y = runif(10000,f_5(0),f_5(pi/8)))
+
+data2$treffer <- 0
+data2$treffer[data2$y <= f_5(data2$x)] <- 1
+
+## Integral rechnen
+Integral <- sum(data2$treffer==1)/10000*pi/8*(f_5(pi/8)-f_5(0))
+Integral
+
+## Visualisierung
+ggplot(data2, aes(x = x, y = y, color = treffer)) +
+  stat_function(fun = f_5)+
+  geom_point()
+
+
+
+
+
+
+
+## Präsenzaufgabe 4a(3)
+f_6 <- function(x) {
+  sin(2 * x) * cos(x)
+}
+## bekommen fmax
+fmax <- optimize(f_6,lower=-pi/2,upper=pi/2,maximum=T)$maximum
+fmin <- optimize(f_6,lower=-pi/2,upper=pi/2,maximum=F)$minimum
+
+## Rechteck
+ggplot(data.frame(x = seq(-pi/2, pi/2, 0.01)), aes(x))+
+  stat_function(fun = f_6)+
+  geom_hline(yintercept=0)+
+  geom_hline(yintercept=f_6(fmax))+
+  geom_hline(yintercept=f_6(fmin))
+
+## data simulation           
+data3 <- data.frame(n = 1:10000,
+                    x = runif(10000,-pi/2, pi/2),
+                    y = runif(10000,0,f_6(fmax)))
+
+data3$treffer <- 0
+data3$treffer[data3$y <= f_6(data3$x)] <- 1
+
+Integral <- sum(data3$treffer==1)/10000*pi*(f_6(fmax)-0)
+Integral
+
+ggplot(data3, aes(x = x, y = y, color = treffer)) +
+  stat_function(fun = f_6)+
+  geom_point()
+
+## Well, es scheint nicht richt,das Ergebnis nicht mit folgend übereinstimmt.
+f <- function(x) {sin(2*x) * cos(x)}
+pi * mean(f(runif(1e6, -pi/2, pi/2)))
+```
+
+---
+
+**Korrektur:** Aufgabe c unvollständig. Nur Positivteil wurde berechnet.
+
+Berechnung von `fmax` wird generell unterschätzt. Rechteck daher vorsichtshalber etwas größer wählen, z.B. `f_6(fmax) * 1.1`.
+
+Negativteil ähnlich wie oben:
+```{r}
+# Positivteil von f_6 wurde bereits oben betrachtet
+#f_6.pos <- function(x) max(0,f_6(x))
+
+#...
+
+# Wir betrachten jetzt den Negativteil von f_6:
+f_6.neg <- function(x) abs(pmin(0,f_6(x)))
+plot(f_6.neg, xlim=c(-pi/2,pi/2))
+
+# man verfährt jetzt wieder genau wie oben für f_6:
+fmax <- optimize(f_6.neg,lower=-pi/2,upper=pi/2,maximum=T)$maximum 
+
+## Monte Carlo simulation           
+data3.neg <- data.frame(n = 1:10000,
+                    x = runif(10000,-pi/2, pi/2), # oder runif(10000,-pi/2, 0) für mehr Effizienz
+                    y = runif(10000,0,f_6.neg(fmax)*1.1))  # Extremwert mit zusätzlichem Sicherheitsabstand
+
+data3.neg$treffer <- 0
+data3.neg$treffer[data3.neg$y <= f_6.neg(data3.neg$x)] <- 1
+
+Integral.neg <- sum(data3.neg$treffer==1)/10000*pi*(f_6.neg(fmax)*1.1-0)
+Integral.neg
+
+ggplot(data3.neg, aes(x = x, y = y, color = treffer)) +
+  stat_function(fun = f_6.neg)+
+  geom_point()
+
+Integral.gesamt <- Integral - Integral.neg
+Integral.gesamt
+
+# es kommt ungefähr 0 heraus.
+```
+
+**Bewertung:** 8/10
+
+**Zusatzaufgabe:** nicht bearbeitet
+
+**insgesamt:** 18 Punkte
+
+---

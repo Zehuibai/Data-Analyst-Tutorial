@@ -1,21 +1,125 @@
 # Data Management using R
 
+## Basis System Seeting
 
-## Basic data management
+### Help and Packages
 
-### apply family
+* Tools Global Options
+  * `getwd()`
+  * `setwd("C:/.../")`
+* Source: http://r-project.org
+* Install and load Packages
+  * `install.packages()`
+  * `library()`
+  * `library(help="pwr")`
+  * Releasing loaded packages: `detach(package:pwr)`
+  * `remove.packages("pwr")`
+  * List all already installed packages: `library()`
+* Help system
+  * Opens the (web) links to the manuals. `help.start()`
+  * Access help for specific functions
+    * `?sqrt`
+    * `help(sqrt)`
+    * `help("sqrt")`
+  * `apropos("mean")` returns a list of function names that contain the expression mean (**functions displayed in the loaded packages.**)
+  * `help(glm, try.all.packages=T)` searches in all installed packages and returns the names of these packages. The help page for a function in a package that has not yet been loaded can then be displayed using the package option.
+  * Alternative `help(glm, package="stats")`
+  * `help.search("truncated")` or `??truncated` searches for a specific word (here truncated) in the online help.
+  * `RSiteSearch("truncated")` searches help pages, vignettes and task views for the keyword “truncated”.
+ 
+### Create Script
+
+* Save a collection of R commands in a text file (R script) with the file extension ".R". 
+* R-Studio: File- New File - R Script
+* Comment
+  * ### in R script
+  * <!--  --> in R markdown
 
 
 
 
+### Basic Mathematische Operatoren & Funktionen
+
+```{r, echo=FALSE, fig.align="center", out.width = '100%',fig.cap="Basic Mathematische Operatoren & Funktionen A"}
+knitr::include_graphics("./02_Plots/02_Math_A.png") 
+```
+
+```{r, echo=FALSE, fig.align="center", out.width = '100%',fig.cap="Basic Mathematische Operatoren & Funktionen B"}
+knitr::include_graphics("./02_Plots/02_Math_B.png") 
+```
+
+
+```
+5 !=2+2
+TRUE & FALSE
+TRUE | FALSE
+(4>= 3|5==6) & (4!=4)
+FALSE || (2 !=3)
+7%/%2
+18%%3
+Inf + Inf + 2
+Inf - Inf + 2
+5/0
+
+x <- 1:7
+(x > 2) && (x < 5)
+(x > 2) | (x < 5)
+(x > 2) || (x < 5)
+```
+
+### Data Type
+
+P93
 
 
 
+### Objects in R
+
+Vector: The `c()` function (for combine or concatenate) is used to define a vector. Examples:
+
+```
+x <- c(1,2,3,4); x
+y <- c(4,3,2,1); y
+z <- c(1:4); z
+w <- c(4:1); w
+u <- seq(1,4); u
+a <- c("Einführung","in R"); a
+seq(from=2,to=6,by=3)
+seq(4,5,length=10)
+```
 
 
+* Data.Frame
+* List: 
 
 
-## import/imput
+### Function in R
+
+```
+my.fun <- function(x1 ,x2) (x1 + x2)/2 # order
+my.fun <- function(x1 ,x2){
+(x1 + x2)/2
+} # order
+my.fun <- function(x1 ,x2){
+y <- (x1 + x2)/2
+y
+}# order
+my.fun <- function(x1 ,x2){
+y <- (x1 + x2)/2
+return(y)
+}
+
+# Calling the function:
+my.fun(100, 200) # order
+my.fun(x1 = 100, x2 = 200) # order
+my.fun(x2 = 200, x1 = 100)
+```
+
+
+## Load Data
+
+
+ 
 
 ### Package readr 
 
@@ -160,6 +264,20 @@ plot(x = my_data$wt, y = my_data$mpg,
 # 3. Close the pdf file
 dev.off() 
 ```
+
+
+
+## Basic Data Management
+
+### apply family
+
+
+
+
+
+
+
+
 
 
 

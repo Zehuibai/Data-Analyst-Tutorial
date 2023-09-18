@@ -1,0 +1,87 @@
+---
+title: "Übungsblatt 11 - Hausaufgaben"
+author: "Zehui Bai,Stefanie Do"
+date: "`r Sys.time()`"
+output: 
+  html_document: 
+    df_print: kable
+    toc: yes
+    toc_depth: 4
+    toc_float: yes
+    code_folding: show
+editor_options:
+  chunk_output_type: console
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE, error = FALSE)
+library(binom)
+library(tidyverse)
+```
+
+
+## Aufgabe 1
+
+```{r aufgabe 1}
+raucher <- matrix(c(14, 26, 1, 12), 
+                  ncol = 2, 
+                  dimnames = list(c("Mann", "Frau"), c("Nichtraucher", "Raucher")))
+chisq.test(raucher)
+fisher.test(raucher)
+```
+
+**Interpretation**
+
+P-Werte für beide Tests (Chi2: p-value = 0.1225 ; Fisher: p-value = 0.08013) sind größer als das Signifikanzniveau von 0.05. Die Ergebnisse sind nicht signifikant, d.h. es gibt keinen statistisch signifikanten Zusammenhang zwischen Rauchen und Geschlecht.
+Der exakte Test von Fisher ist für die Berechung besser geeignet, da der $\chi^2$-Test in diesem Beispiel durch eine geringe Fallzahl eine inkorrekte Approximation wiedergibt. Letzter benötigt in jeder Zelle eine Mindest-Fallzahl von 5, was durch die Kategorie "Mann" & "Raucher" mit 1 Person nicht erfüllt wurde.
+
+---
+
+**Bewertung:** Alles richtig, 6/6
+
+---
+
+## Aufgabe 2
+
+```{r aufgabe 2}
+data(airquality)
+
+## Korrelationsmatrix
+cor(airquality[1:4],use = "pairwise.complete.obs")
+
+## Korrelationsmatrix Test
+library(psych)
+cts <- corr.test(airquality[1:4])
+print(corr.p(cts$r,n=30),short=FALSE)
+```
+
+**Interpretation**
+
+Nach Korrelationsmatrix Test sind Variablen Ozone mit Wind, Solar.R mit Wind, Wind mit Temp korreliert.
+
+---
+
+**Bewertung:** Test gut ausgewählt. 6/6
+
+---
+
+## Aufgabe 3
+
+```{r aufgabe 3}
+data(survey,package = "MASS")
+survey$Smoke <- factor(survey$Smoke, levels = c("Never", "Occas", "Regul", "Heavy"), ordered = TRUE)
+survey$Smoke <- as.numeric(survey$Smoke)
+cor.test(survey$Smoke, survey$Pulse, method = "kendall")
+```
+
+**Interpretation**
+
+P-Wert ist 0.8301 größer als das Signifikanzniveau von 0.05. Das Ergebnis ist somit nicht signifikant, d.h. es gibt keinen statistisch signiﬁkanten Zusammenhang zwischen der Pulsrate und dem Rauchverhalten.
+
+---
+
+**Bewertung:** Auch die letzte Aufgabe ist richtig, 8/8
+
+**Insgesamt:** 20/20
+
+---

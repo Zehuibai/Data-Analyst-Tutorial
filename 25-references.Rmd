@@ -4,3 +4,11 @@
 
 * [A Brief Introduction to Performing Statistical Analysis in SAS, R & Python](https://www.lexjansen.com/pharmasug/2020/SA/PharmaSUG-2020-SA-207.pdf)
 * [Practical Data Science With R](https://ninazumel.com/practical-data-science-with-r/)
+* D. Chen, K. Peace, Clinical Trial Data Analysis Using R, 2011
+* T. Rahlf, Data Visualisation with R, 2017
+* S. Stowell, Using R for Statistics, 2014
+* T. Hothorn, B.S. Everitt, A Handbook of Statistical Analyses Using R, 2014
+
+
+Further books see:
+* http://r-project.org/doc/bib/R-books.html
