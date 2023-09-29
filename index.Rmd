@@ -15,6 +15,7 @@ The R Project for Statistical Computing is hosted at https://www.r-project.org/.
 ##  Lifecycle of Data Analysis Project
 
 ```{r, echo=FALSE, fig.align="center", out.width = '100%',fig.cap="Lifecycle of Data Analysis Project"}
+setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 knitr::include_graphics("./02_Plots/01_DS_Lifecycle.png") 
 ```
 
